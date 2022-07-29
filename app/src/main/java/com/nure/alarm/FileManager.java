@@ -21,7 +21,7 @@ public class FileManager {
             FileOutputStream fos;
             try {
                 fos = context.openFileOutput(FILE_NAME, Context.MODE_PRIVATE);
-                fos.write(("{\"status\": false}").getBytes());
+                fos.write(("{\"status\": false, \"alarmHour\": 0, \"alarmMinute\": 0}").getBytes());
                 fos.close();
             } catch (IOException ioException) {
                 ioException.printStackTrace();
@@ -62,7 +62,9 @@ public class FileManager {
             JSONObject object =  new JSONObject(readJSON(context));
 
             return new Information(
-                    object.getBoolean("status")
+                    object.getBoolean("status"),
+                    object.getInt("alarmHour"),
+                    object.getInt("alarmMinute")
             );
         } catch (JSONException e) {
             e.printStackTrace();
@@ -76,6 +78,8 @@ public class FileManager {
 
         try {
             object.put("status", information.getStatus());
+            object.put("alarmHour", information.getAlarmHour());
+            object.put("alarmMinute", information.getAlarmMinute());
         } catch (JSONException e) {
             e.printStackTrace();
         }
