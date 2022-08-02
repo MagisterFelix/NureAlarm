@@ -1,16 +1,11 @@
 package com.nure.alarm;
 
 import android.app.TimePickerDialog;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Menu;
 import android.widget.Button;
-import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.work.Constraints;
 import androidx.work.NetworkType;
@@ -38,30 +33,11 @@ public class MainActivity extends AppCompatActivity {
         timeButton = findViewById(R.id.time_button);
         timeButton.setOnClickListener(view -> selectTime());
         timeButton.setText(String.format(Locale.getDefault(), "%02d:%02d", information.getAlarmSettingHour(), information.getAlarmSettingMinute()));
-
-        if (noOverlayPermission()) {
-            Toast.makeText(this, R.string.permission_message, Toast.LENGTH_SHORT).show();
-            openOverlayPermissionActivityForResult();
-        }
     }
 
     private boolean noOverlayPermission() {
         return !Settings.canDrawOverlays(MainActivity.this);
     }
-
-    private void openOverlayPermissionActivityForResult() {
-        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
-        overlayPermissionActivityResultLauncher.launch(intent);
-    }
-
-    private final ActivityResultLauncher<Intent> overlayPermissionActivityResultLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (noOverlayPermission()) {
-                    Toast.makeText(this, R.string.permission_message, Toast.LENGTH_SHORT).show();
-                    openOverlayPermissionActivityForResult();
-                }
-            });
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -70,13 +46,19 @@ public class MainActivity extends AppCompatActivity {
         SwitchMaterial switchMaterial = menu.findItem(R.id.switchStatus).getActionView().findViewById(R.id.switchStatus);
         switchMaterial.setChecked(information.getStatus());
         switchMaterial.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            information.setStatus(isChecked);
-            FileManager.updateInfo(this, information);
-
-            if (isChecked) {
-                enableAlarm();
+            if (noOverlayPermission()) {
+                compoundButton.setChecked(false);
+                PermissionDialog permissionDialog = new PermissionDialog();
+                permissionDialog.show(getSupportFragmentManager(), "PermissionDialog");
             } else {
-                disableAlarm();
+                information.setStatus(isChecked);
+                FileManager.updateInfo(this, information);
+
+                if (isChecked) {
+                    enableAlarm();
+                } else {
+                    disableAlarm();
+                }
             }
         });
 
