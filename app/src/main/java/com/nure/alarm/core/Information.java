@@ -1,4 +1,4 @@
-package com.nure.alarm;
+package com.nure.alarm.core;
 
 public class Information {
     private boolean status;

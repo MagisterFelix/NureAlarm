@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NureAlarm">
         <activity
-            android:name=".MainActivity"
+            android:name=".views.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".AlarmWorkManagerReceiver"
+        <receiver android:name=".worker.AlarmWorkManagerReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

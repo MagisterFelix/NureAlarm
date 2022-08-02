@@ -1,4 +1,4 @@
-package com.nure.alarm;
+package com.nure.alarm.views;
 
 import android.app.TimePickerDialog;
 import android.os.Bundle;
@@ -13,6 +13,11 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.nure.alarm.core.Alarm;
+import com.nure.alarm.worker.AlarmWorker;
+import com.nure.alarm.core.FileManager;
+import com.nure.alarm.core.Information;
+import com.nure.alarm.R;
 
 import java.util.Calendar;
 import java.util.Locale;

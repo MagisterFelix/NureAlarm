@@ -1,4 +1,4 @@
-package com.nure.alarm;
+package com.nure.alarm.worker;
 
 import android.content.Context;
 
@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+
+import com.nure.alarm.core.Alarm;
 
 public class AlarmWorker extends Worker {
 

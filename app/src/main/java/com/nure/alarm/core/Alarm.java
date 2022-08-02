@@ -1,4 +1,4 @@
-package com.nure.alarm;
+package com.nure.alarm.core;
 
 import android.content.Context;
 import android.content.Intent;
