@@ -3,6 +3,7 @@ package com.nure.alarm;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 
@@ -18,7 +19,14 @@ public class PermissionDialog extends AppCompatDialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Permission")
                 .setMessage(R.string.permission_message)
-                .setPositiveButton("ok", (dialogInterface, i) -> startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)));
+                .setPositiveButton("ok", (dialogInterface, i) -> {
+                        if (getArguments() != null) {
+                            startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                    Uri.parse("package:" + getArguments().getString("packageName"))));
+                        } else {
+                            startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION));
+                        }
+                });
         return builder.create();
     }
 }

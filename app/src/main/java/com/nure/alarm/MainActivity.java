@@ -49,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
             if (noOverlayPermission()) {
                 compoundButton.setChecked(false);
                 PermissionDialog permissionDialog = new PermissionDialog();
+                Bundle bundle = new Bundle();
+                bundle.putString("packageName", getPackageName());
+                permissionDialog.setArguments(bundle);
                 permissionDialog.show(getSupportFragmentManager(), "PermissionDialog");
             } else {
                 information.setStatus(isChecked);
