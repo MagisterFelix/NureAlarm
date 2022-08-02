@@ -2,13 +2,13 @@ package com.nure.alarm;
 
 public class Information {
     private boolean status;
-    private int alarmHour;
-    private int alarmMinute;
+    private int alarmSettingHour;
+    private int alarmSettingMinute;
 
-    public Information(boolean status, int alarmHour, int alarmMinute) {
+    public Information(boolean status, int alarmSettingHour, int alarmSettingMinute) {
         this.status = status;
-        this.alarmHour = alarmHour;
-        this.alarmMinute = alarmMinute;
+        this.alarmSettingHour = alarmSettingHour;
+        this.alarmSettingMinute = alarmSettingMinute;
     }
 
     public boolean getStatus() {
@@ -19,19 +19,19 @@ public class Information {
         this.status = status;
     }
 
-    public int getAlarmHour() {
-        return alarmHour;
+    public int getAlarmSettingHour() {
+        return alarmSettingHour;
     }
 
-    public void setAlarmHour(int alarmHour) {
-        this.alarmHour = alarmHour;
+    public void setAlarmSettingHour(int alarmSettingHour) {
+        this.alarmSettingHour = alarmSettingHour;
     }
 
-    public int getAlarmMinute() {
-        return alarmMinute;
+    public int getAlarmSettingMinute() {
+        return alarmSettingMinute;
     }
 
-    public void setAlarmMinute(int alarmMinute) {
-        this.alarmMinute = alarmMinute;
+    public void setAlarmSettingMinute(int alarmSettingMinute) {
+        this.alarmSettingMinute = alarmSettingMinute;
     }
 }

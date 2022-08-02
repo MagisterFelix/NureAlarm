@@ -21,7 +21,7 @@ public class FileManager {
             FileOutputStream fos;
             try {
                 fos = context.openFileOutput(FILE_NAME, Context.MODE_PRIVATE);
-                fos.write(("{\"status\": false, \"alarmHour\": 0, \"alarmMinute\": 0}").getBytes());
+                fos.write(("{\"status\": false, \"alarmSettingHour\": 0, \"alarmSettingMinute\": 0}").getBytes());
                 fos.close();
             } catch (IOException ioException) {
                 ioException.printStackTrace();
@@ -63,8 +63,8 @@ public class FileManager {
 
             return new Information(
                     object.getBoolean("status"),
-                    object.getInt("alarmHour"),
-                    object.getInt("alarmMinute")
+                    object.getInt("alarmSettingHour"),
+                    object.getInt("alarmSettingMinute")
             );
         } catch (JSONException e) {
             e.printStackTrace();
@@ -78,8 +78,8 @@ public class FileManager {
 
         try {
             object.put("status", information.getStatus());
-            object.put("alarmHour", information.getAlarmHour());
-            object.put("alarmMinute", information.getAlarmMinute());
+            object.put("alarmSettingHour", information.getAlarmSettingHour());
+            object.put("alarmSettingMinute", information.getAlarmSettingMinute());
         } catch (JSONException e) {
             e.printStackTrace();
         }
