@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import androidx.work.Constraints;
 import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
@@ -34,7 +35,14 @@ public class AlarmWorkManagerReceiver extends BroadcastReceiver {
 
                 if (startTime.before(now) || startTime.equals(now)) {
                     startTime.add(Calendar.DATE, 1);
-                    Alarm.setAlarm(context);
+
+                    OneTimeWorkRequest request = new OneTimeWorkRequest
+                            .Builder(AlarmWorker.class)
+                            .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                            .addTag("AlarmWork")
+                            .build();
+
+                    WorkManager.getInstance(context).enqueue(request);
                 }
 
                 long delay = startTime.getTimeInMillis() - now.getTimeInMillis();
