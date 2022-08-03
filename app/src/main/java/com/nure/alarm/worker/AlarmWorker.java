@@ -19,7 +19,6 @@ public class AlarmWorker extends Worker {
     @Override
     public Result doWork() {
         Alarm.setAlarm(getApplicationContext());
-        Data data = new Data.Builder().putString("result", "Alarm clock set").build();
-        return Result.success(data);
+        return Result.success();
     }
 }
