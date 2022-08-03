@@ -9,15 +9,16 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.work.Constraints;
 import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.nure.alarm.R;
 import com.nure.alarm.core.Alarm;
-import com.nure.alarm.worker.AlarmWorker;
 import com.nure.alarm.core.FileManager;
 import com.nure.alarm.core.Information;
-import com.nure.alarm.R;
+import com.nure.alarm.worker.AlarmWorker;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -83,7 +84,14 @@ public class MainActivity extends AppCompatActivity {
 
         if (startTime.before(now) || startTime.equals(now)) {
             startTime.add(Calendar.DATE, 1);
-            Alarm.setAlarm(getApplicationContext());
+
+            OneTimeWorkRequest request = new OneTimeWorkRequest
+                    .Builder(AlarmWorker.class)
+                    .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                    .addTag("AlarmWork")
+                    .build();
+
+            WorkManager.getInstance(this).enqueue(request);
         }
 
         return startTime.getTimeInMillis() - now.getTimeInMillis();
