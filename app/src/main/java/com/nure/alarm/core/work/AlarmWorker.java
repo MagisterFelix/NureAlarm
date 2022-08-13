@@ -1,9 +1,8 @@
-package com.nure.alarm.worker;
+package com.nure.alarm.core.work;
 
 import android.content.Context;
 
 import androidx.annotation.NonNull;
-import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
