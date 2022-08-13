@@ -151,13 +151,19 @@ public class MainActivity extends AppCompatActivity {
                     NotSpecifiedInformationDialog notSpecifiedInformationDialog = new NotSpecifiedInformationDialog();
                     notSpecifiedInformationDialog.show(getSupportFragmentManager(), "NotSpecifiedInformationDialog");
                 } else {
-                    information.setStatus(isChecked);
-                    FileManager.writeInfo(getApplicationContext(), information);
+                    if (NetworkStatus.isAvailable(getApplication())) {
+                        information.setStatus(isChecked);
+                        FileManager.writeInfo(getApplicationContext(), information);
 
-                    if (isChecked) {
-                        Alarm.enableAlarm(getApplicationContext(), information);
-                    } else {
-                        Alarm.disableAlarm(getApplicationContext());
+                        if (isChecked) {
+                            Alarm.enableAlarm(getApplicationContext(), information);
+                        } else {
+                            Alarm.disableAlarm(getApplicationContext());
+                        }
+                    } else{
+                        compoundButton.setChecked(false);
+                        UnavailableNetworkDialog unavailableNetworkDialog = new UnavailableNetworkDialog();
+                        unavailableNetworkDialog.show(getSupportFragmentManager(), "UnavailableNetworkDialog");
                     }
                 }
             }
