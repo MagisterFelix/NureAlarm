@@ -1,58 +1,144 @@
 package com.nure.alarm.views;
 
+import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.work.Constraints;
-import androidx.work.NetworkType;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.nure.alarm.R;
 import com.nure.alarm.core.Alarm;
 import com.nure.alarm.core.FileManager;
-import com.nure.alarm.core.Information;
-import com.nure.alarm.worker.AlarmWorker;
+import com.nure.alarm.core.api.Request;
+import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.network.NetworkStatus;
+import com.nure.alarm.views.dialogs.NotSpecifiedInformationDialog;
+import com.nure.alarm.views.dialogs.UnavailableNetworkDialog;
+import com.nure.alarm.views.dialogs.PermissionDialog;
+import com.nure.alarm.views.dialogs.ReceivingGroupsDialog;
 
-import java.util.Calendar;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
 
     private Information information;
-    private Button timeButton;
+
+    private Button settingTimeButton;
+    private TextView groupTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        information = FileManager.getInfo(this);
+        information = FileManager.readInfo(getApplicationContext());
 
-        timeButton = findViewById(R.id.time_button);
-        timeButton.setOnClickListener(view -> selectTime());
-        timeButton.setText(String.format(Locale.getDefault(), "%02d:%02d", information.getAlarmSettingHour(), information.getAlarmSettingMinute()));
-    }
+        Request request = new Request(getApplicationContext());
+        request.getGroups(getSupportFragmentManager());
 
-    private boolean noOverlayPermission() {
-        return !Settings.canDrawOverlays(MainActivity.this);
+        settingTimeButton = findViewById(R.id.setting_time_button);
+        if (information.getSettingHour() != -1 && information.getSettingMinute() != -1) {
+            settingTimeButton.setText(String.format(Locale.getDefault(), "%02d:%02d", information.getSettingHour(), information.getSettingMinute()));
+        }
+        settingTimeButton.setOnClickListener(view -> {
+            TimePickerDialog.OnTimeSetListener onTimeSetListener = (timePicker, selectedHour, selectedMinute) -> {
+                information.setSettingHour(selectedHour);
+                information.setSettingMinute(selectedMinute);
+                FileManager.writeInfo(getApplicationContext(), information);
+
+                settingTimeButton.setText(String.format(Locale.getDefault(), "%02d:%02d", information.getSettingHour(), information.getSettingMinute()));
+            };
+
+            TimePickerDialog timePickerDialog = new TimePickerDialog(
+                    MainActivity.this,
+                    onTimeSetListener,
+                    information.getSettingHour(),
+                    information.getSettingMinute(),
+                    true
+            );
+            timePickerDialog.show();
+        });
+
+        groupTextView = findViewById(R.id.group);
+        if (!information.getGroup().isEmpty()) {
+            groupTextView.setText(information.getGroup());
+        }
+        groupTextView.setOnClickListener(v -> {
+            HashMap<String, Integer> groups = FileManager.readGroups(getApplicationContext());
+
+            if (groups.size() > 0) {
+                Dialog dialog = new Dialog(MainActivity.this);
+                dialog.setContentView(R.layout.spinner);
+
+                int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.9);
+                int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.8);
+
+                dialog.getWindow().setLayout(width, height);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+
+                EditText editText = dialog.findViewById(R.id.edit_text);
+                ListView listView = dialog.findViewById(R.id.list_view);
+
+                ArrayList<String> sorted_groups = (ArrayList<String>) new ArrayList<>(groups.keySet()).stream().sorted().collect(Collectors.toList());
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, sorted_groups);
+
+                listView.setAdapter(adapter);
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence string, int start, int count, int after) {}
+
+                    @Override
+                    public void onTextChanged(CharSequence string, int start, int before, int count) {
+                        adapter.getFilter().filter(string);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable string) {}
+                });
+
+                listView.setOnItemClickListener((parent, view, position, id) -> {
+                    groupTextView.setText(adapter.getItem(position));
+                    information.setGroup(adapter.getItem(position));
+                    FileManager.writeInfo(getApplicationContext(), information);
+                    dialog.dismiss();
+                });
+            } else {
+                if (NetworkStatus.isAvailable(getApplication())) {
+                    ReceivingGroupsDialog receivingGroupsDialog = new ReceivingGroupsDialog();
+                    receivingGroupsDialog.show(getSupportFragmentManager(), "ReceivingGroupsDialog");
+                } else{
+                    UnavailableNetworkDialog unavailableNetworkDialog = new UnavailableNetworkDialog();
+                    unavailableNetworkDialog.show(getSupportFragmentManager(), "UnavailableNetworkDialog");
+                }
+            }
+        });
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
 
         SwitchMaterial switchMaterial = menu.findItem(R.id.switchStatus).getActionView().findViewById(R.id.switchStatus);
         switchMaterial.setChecked(information.getStatus());
         switchMaterial.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            if (noOverlayPermission()) {
+            if (!Settings.canDrawOverlays(MainActivity.this)) {
                 compoundButton.setChecked(false);
                 PermissionDialog permissionDialog = new PermissionDialog();
                 Bundle bundle = new Bundle();
@@ -60,70 +146,23 @@ public class MainActivity extends AppCompatActivity {
                 permissionDialog.setArguments(bundle);
                 permissionDialog.show(getSupportFragmentManager(), "PermissionDialog");
             } else {
-                information.setStatus(isChecked);
-                FileManager.updateInfo(this, information);
-
-                if (isChecked) {
-                    enableAlarm();
+                if (information.getSettingHour() == -1 && information.getSettingMinute() == -1 || information.getGroup().isEmpty()) {
+                    compoundButton.setChecked(false);
+                    NotSpecifiedInformationDialog notSpecifiedInformationDialog = new NotSpecifiedInformationDialog();
+                    notSpecifiedInformationDialog.show(getSupportFragmentManager(), "NotSpecifiedInformationDialog");
                 } else {
-                    disableAlarm();
+                    information.setStatus(isChecked);
+                    FileManager.writeInfo(getApplicationContext(), information);
+
+                    if (isChecked) {
+                        Alarm.enableAlarm(getApplicationContext(), information);
+                    } else {
+                        Alarm.disableAlarm(getApplicationContext());
+                    }
                 }
             }
         });
 
         return true;
-    }
-
-    private long getDelay() {
-        Calendar now = Calendar.getInstance();
-
-        Calendar startTime = Calendar.getInstance();
-        startTime.set(Calendar.HOUR_OF_DAY, information.getAlarmSettingHour());
-        startTime.set(Calendar.MINUTE, information.getAlarmSettingMinute());
-        startTime.set(Calendar.SECOND, 0);
-
-        if (startTime.before(now) || startTime.equals(now)) {
-            startTime.add(Calendar.DATE, 1);
-
-            OneTimeWorkRequest request = new OneTimeWorkRequest
-                    .Builder(AlarmWorker.class)
-                    .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-                    .addTag("AlarmWork")
-                    .build();
-
-            WorkManager.getInstance(this).enqueue(request);
-        }
-
-        return startTime.getTimeInMillis() - now.getTimeInMillis();
-    }
-
-    private void enableAlarm() {
-        PeriodicWorkRequest request = new PeriodicWorkRequest
-                .Builder(AlarmWorker.class, 1, TimeUnit.DAYS)
-                .setInitialDelay(getDelay(), TimeUnit.MILLISECONDS)
-                .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-                .addTag("AlarmWork")
-                .build();
-
-        WorkManager.getInstance(this).enqueue(request);
-    }
-
-    private void disableAlarm() {
-        Alarm.cancelAlarm(getApplicationContext());
-        WorkManager.getInstance(this).cancelAllWorkByTag("AlarmWork");
-    }
-
-    private void selectTime() {
-        TimePickerDialog.OnTimeSetListener onTimeSetListener = (timePicker, selectedHour, selectedMinute) -> {
-            information.setAlarmSettingHour(selectedHour);
-            information.setAlarmSettingMinute(selectedMinute);
-            FileManager.updateInfo(this, information);
-
-            timeButton.setText(String.format(Locale.getDefault(), "%02d:%02d", information.getAlarmSettingHour(), information.getAlarmSettingMinute()));
-        };
-
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this, onTimeSetListener,
-                information.getAlarmSettingHour(), information.getAlarmSettingMinute(), true);
-        timePickerDialog.show();
     }
 }
