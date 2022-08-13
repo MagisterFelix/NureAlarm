@@ -1,7 +1,13 @@
 <resources>
     <string name="app_name">NureAlarm</string>
     <string name="status">Status</string>
-    <string name="select_time">Select Time</string>
+    <string name="select_time">Select time</string>
     <string name="label_alarm">Alarm setting time</string>
-    <string name="permission_message">You must grant NureAlarm permission to display over other apps</string>
+    <string name="permission_message">You must grant NureAlarm permission to display over other apps.</string>
+    <string name="select_group">Select group</string>
+    <string name="search">Search…</string>
+    <string name="receiving_groups_message">NureAlarm receives a list of groups, please wait a moment.</string>
+    <string name="unavailable_network_message">In order to use NureAlarm you need a stable internet connection. Please connect to Wi-Fi or turn on the mobile network.</string>
+    <string name="failed_groups_request_message">Failed to get list of groups. You may have a poor internet connection or the cist.nure.ua is not responding.</string>
+    <string name="not_specified_information">To start the application, you must specify the alarm setting time and group.</string>
 </resources>

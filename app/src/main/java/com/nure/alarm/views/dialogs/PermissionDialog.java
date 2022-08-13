@@ -1,4 +1,4 @@
-package com.nure.alarm.views;
+package com.nure.alarm.views.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
