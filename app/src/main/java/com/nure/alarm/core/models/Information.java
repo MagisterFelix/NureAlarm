@@ -1,12 +1,14 @@
 package com.nure.alarm.core.models;
 
+import org.json.JSONObject;
+
 public class Information {
     private boolean status;
     private int settingHour;
     private int settingMinute;
-    private String group;
+    private JSONObject group;
 
-    public Information(boolean status, int settingHour, int settingMinute, String group) {
+    public Information(boolean status, int settingHour, int settingMinute, JSONObject group) {
         this.status = status;
         this.settingHour = settingHour;
         this.settingMinute = settingMinute;
@@ -37,11 +39,11 @@ public class Information {
         this.settingMinute = settingMinute;
     }
 
-    public String getGroup() {
+    public JSONObject getGroup() {
         return group;
     }
 
-    public void setGroup(String group) {
+    public void setGroup(JSONObject group) {
         this.group = group;
     }
 }

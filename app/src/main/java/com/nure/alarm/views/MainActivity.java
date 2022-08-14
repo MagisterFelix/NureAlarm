@@ -26,9 +26,12 @@ import com.nure.alarm.core.api.Request;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.network.NetworkStatus;
 import com.nure.alarm.views.dialogs.NotSpecifiedInformationDialog;
-import com.nure.alarm.views.dialogs.UnavailableNetworkDialog;
 import com.nure.alarm.views.dialogs.PermissionDialog;
 import com.nure.alarm.views.dialogs.ReceivingGroupsDialog;
+import com.nure.alarm.views.dialogs.UnavailableNetworkDialog;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,8 +79,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         groupTextView = findViewById(R.id.group);
-        if (!information.getGroup().isEmpty()) {
-            groupTextView.setText(information.getGroup());
+        if (information.getGroup().length() != 0) {
+            try {
+                groupTextView.setText(information.getGroup().getString("name"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         groupTextView.setOnClickListener(v -> {
             HashMap<String, Integer> groups = FileManager.readGroups(getApplicationContext());
@@ -115,7 +122,14 @@ public class MainActivity extends AppCompatActivity {
 
                 listView.setOnItemClickListener((parent, view, position, id) -> {
                     groupTextView.setText(adapter.getItem(position));
-                    information.setGroup(adapter.getItem(position));
+                    JSONObject object = new JSONObject();
+                    try {
+                        object.put("id", groups.get(adapter.getItem(position)));
+                        object.put("name", adapter.getItem(position));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    information.setGroup(object);
                     FileManager.writeInfo(getApplicationContext(), information);
                     dialog.dismiss();
                 });
@@ -146,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
                 permissionDialog.setArguments(bundle);
                 permissionDialog.show(getSupportFragmentManager(), "PermissionDialog");
             } else {
-                if (information.getSettingHour() == -1 && information.getSettingMinute() == -1 || information.getGroup().isEmpty()) {
+                if (information.getSettingHour() == -1 && information.getSettingMinute() == -1 || information.getGroup().length() == 0) {
                     compoundButton.setChecked(false);
                     NotSpecifiedInformationDialog notSpecifiedInformationDialog = new NotSpecifiedInformationDialog();
                     notSpecifiedInformationDialog.show(getSupportFragmentManager(), "NotSpecifiedInformationDialog");

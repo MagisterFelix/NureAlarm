@@ -23,7 +23,7 @@ public class FileManager {
     private static final boolean STATUS_OFF = false;
     private static final int UNDEFINED_SETTING_HOUR = -1;
     private static final int UNDEFINED_SETTING_MINUTE = -1;
-    private static final String UNDEFINED_GROUP = "";
+    private static final JSONObject UNDEFINED_GROUP = new JSONObject();
 
     private static void createIfNotExist(Context context, String file) {
         try {
@@ -76,7 +76,7 @@ public class FileManager {
                     object.getBoolean("status"),
                     object.getInt("settingHour"),
                     object.getInt("settingMinute"),
-                    object.getString("group")
+                    object.getJSONObject("group")
             );
         } catch (JSONException e) {
             e.printStackTrace();
