@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nure.alarm.core.models.Information;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,6 +25,7 @@ public class FileManager {
     private static final int UNDEFINED_SETTING_HOUR = -1;
     private static final int UNDEFINED_SETTING_MINUTE = -1;
     private static final JSONObject UNDEFINED_GROUP = new JSONObject();
+    private static final JSONArray UNDEFINED_LESSONS = new JSONArray();
 
     private static void createIfNotExist(Context context, String file) {
         try {
@@ -76,13 +78,14 @@ public class FileManager {
                     object.getBoolean("status"),
                     object.getInt("settingHour"),
                     object.getInt("settingMinute"),
-                    object.getJSONObject("group")
+                    object.getJSONObject("group"),
+                    object.getJSONArray("lessons")
             );
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        return new Information(STATUS_OFF, UNDEFINED_SETTING_HOUR, UNDEFINED_SETTING_MINUTE, UNDEFINED_GROUP);
+        return new Information(STATUS_OFF, UNDEFINED_SETTING_HOUR, UNDEFINED_SETTING_MINUTE, UNDEFINED_GROUP, UNDEFINED_LESSONS);
     }
 
     public static void writeInfo(Context context, Information information) {
@@ -92,6 +95,7 @@ public class FileManager {
             object.put("settingHour", information.getSettingHour());
             object.put("settingMinute", information.getSettingMinute());
             object.put("group", information.getGroup());
+            object.put("lessons", information.getLessons());
             writeJSON(context, object, INFO_FILE);
         } catch (JSONException e) {
             e.printStackTrace();
