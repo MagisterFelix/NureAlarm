@@ -1,4 +1,4 @@
-package com.nure.alarm;
+package com.nure.alarm.views.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -10,6 +10,8 @@ import android.provider.Settings;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDialogFragment;
+
+import com.nure.alarm.R;
 
 public class PermissionDialog extends AppCompatDialogFragment {
 
