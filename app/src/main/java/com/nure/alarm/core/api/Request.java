@@ -1,21 +1,38 @@
 package com.nure.alarm.core.api;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
+import com.nure.alarm.R;
 import com.nure.alarm.core.FileManager;
 import com.nure.alarm.core.SessionManager;
+import com.nure.alarm.core.models.Information;
 import com.nure.alarm.views.dialogs.FailedGroupsRequestDialog;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -58,5 +75,44 @@ public class Request {
                 }
             });
         }
+    }
+
+    public void getTimeTable(String from_date, String to_date, long group_id) {
+        String unformatted_query = "778:201::::201:P201_FIRST_DATE,P201_LAST_DATE,P201_GROUP,P201_POTOK:%s,%s,%d,0:";
+        String query = String.format(Locale.getDefault(), unformatted_query, from_date, to_date, group_id);
+        apiClient.getApiService().timetable(query).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                try {
+                    JSONArray jsonArray = new JSONArray();
+
+                    String html = Objects.requireNonNull(response.body()).string();
+                    Document document = Jsoup.parse(html);
+                    Elements elements = document.select("tr");
+                    for (Element element : elements.subList(2, elements.size() - 1)) {
+                        if (element.children().size() == 3){
+                            JSONObject object = new JSONObject();
+                            object.put("number", element.child(0).text());
+                            object.put("time", element.child(1).text());
+                            object.put("name", element.child(2).text());
+                            jsonArray.put(object);
+                        }
+                    }
+
+                    Information information = FileManager.readInfo(context);
+                    information.setLessons(jsonArray);
+                    FileManager.writeInfo(context, information);
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
+                Information information = FileManager.readInfo(context);
+                information.setLessons(new JSONArray().put(R.string.failed_timetable_request_message));
+                FileManager.writeInfo(context, information);
+            }
+        });
     }
 }
