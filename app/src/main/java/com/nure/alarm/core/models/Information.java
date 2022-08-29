@@ -1,5 +1,6 @@
 package com.nure.alarm.core.models;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Information {
@@ -7,12 +8,14 @@ public class Information {
     private int settingHour;
     private int settingMinute;
     private JSONObject group;
+    private JSONArray lessons;
 
-    public Information(boolean status, int settingHour, int settingMinute, JSONObject group) {
+    public Information(boolean status, int settingHour, int settingMinute, JSONObject group, JSONArray lessons) {
         this.status = status;
         this.settingHour = settingHour;
         this.settingMinute = settingMinute;
         this.group = group;
+        this.lessons = lessons;
     }
 
     public boolean getStatus() {
@@ -46,4 +49,8 @@ public class Information {
     public void setGroup(JSONObject group) {
         this.group = group;
     }
+
+    public JSONArray getLessons() { return lessons; }
+
+    public void setLessons(JSONArray lessons) { this.lessons = lessons; }
 }
