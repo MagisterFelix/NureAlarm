@@ -107,7 +107,7 @@ public class Request {
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                 Information information = FileManager.readInfo(context);
-                information.setLessons(new JSONArray().put(R.string.failed_timetable_request_message));
+                information.setLessons(new JSONArray().put(context.getString(R.string.failed_timetable_request_message)));
                 FileManager.writeInfo(context, information);
             }
         });
