@@ -10,9 +10,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
 import com.nure.alarm.R;
+import com.nure.alarm.core.Alarm;
 import com.nure.alarm.core.FileManager;
 import com.nure.alarm.core.SessionManager;
 import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.notification.AlarmNotification;
 import com.nure.alarm.views.dialogs.FailedGroupsRequestDialog;
 
 import org.json.JSONArray;
@@ -24,6 +26,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
@@ -81,7 +85,7 @@ public class Request {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 try {
-                    JSONArray jsonArray = new JSONArray();
+                    JSONArray lessons = new JSONArray();
 
                     String html = Objects.requireNonNull(response.body()).string();
                     Document document = Jsoup.parse(html);
@@ -92,14 +96,30 @@ public class Request {
                             object.put("number", element.child(0).text());
                             object.put("time", element.child(1).text());
                             object.put("name", element.child(2).text());
-                            jsonArray.put(object);
+                            lessons.put(object);
                         }
                     }
 
                     Information information = FileManager.readInfo(context);
-                    information.setLessons(jsonArray);
+                    information.setLessons(lessons);
                     FileManager.writeInfo(context, information);
-                } catch (IOException | JSONException e) {
+
+                    if (lessons.length() == 0) {
+                        AlarmNotification.sendNotification(context, "No lessons!", null);
+                    } else {
+                        JSONObject lesson =  lessons.getJSONObject(0);
+                        String string_time = lesson.getString("time").split(" ")[0];
+                        Calendar time = Calendar.getInstance();
+                        time.setTime(Objects.requireNonNull(new SimpleDateFormat("HH:mm", Locale.getDefault()).parse(string_time)));
+                        time.add(Calendar.MILLISECOND, -(information.getDelay() * 60000));
+
+                        Alarm.setAlarm(context, time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE));
+
+                        String unformatted_message = "Alarm clock set for %s lesson - %s";
+                        String message = String.format(Locale.getDefault(), unformatted_message, lesson.getString("number"), lesson.getString("name"));
+                        AlarmNotification.sendNotification(context, message, lessons);
+                    }
+                } catch (IOException | JSONException | ParseException e) {
                     e.printStackTrace();
                 }
             }
@@ -109,6 +129,8 @@ public class Request {
                 Information information = FileManager.readInfo(context);
                 information.setLessons(new JSONArray().put(context.getString(R.string.failed_timetable_request_message)));
                 FileManager.writeInfo(context, information);
+
+                AlarmNotification.sendNotification(context, context.getString(R.string.failed_timetable_request_message), null);
             }
         });
     }
