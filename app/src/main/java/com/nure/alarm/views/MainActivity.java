@@ -9,10 +9,13 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -34,6 +37,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -104,16 +108,16 @@ public class MainActivity extends AppCompatActivity {
                 ListView listView = dialog.findViewById(R.id.list_view);
 
                 ArrayList<String> sorted_groups = (ArrayList<String>) new ArrayList<>(groups.keySet()).stream().sorted().collect(Collectors.toList());
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, sorted_groups);
+                ArrayAdapter<String> groupAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, sorted_groups);
 
-                listView.setAdapter(adapter);
+                listView.setAdapter(groupAdapter);
                 editText.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence string, int start, int count, int after) {}
 
                     @Override
                     public void onTextChanged(CharSequence string, int start, int before, int count) {
-                        adapter.getFilter().filter(string);
+                        groupAdapter.getFilter().filter(string);
                     }
 
                     @Override
@@ -121,11 +125,11 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 listView.setOnItemClickListener((parent, view, position, id) -> {
-                    groupTextView.setText(adapter.getItem(position));
+                    groupTextView.setText(groupAdapter.getItem(position));
                     JSONObject object = new JSONObject();
                     try {
-                        object.put("id", groups.get(adapter.getItem(position)));
-                        object.put("name", adapter.getItem(position));
+                        object.put("id", groups.get(groupAdapter.getItem(position)));
+                        object.put("name", groupAdapter.getItem(position));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -142,6 +146,23 @@ public class MainActivity extends AppCompatActivity {
                     unavailableNetworkDialog.show(getSupportFragmentManager(), "UnavailableNetworkDialog");
                 }
             }
+        });
+
+        Spinner delay = findViewById(R.id.delay);
+        ArrayList<Integer> keys = new ArrayList<>(Arrays.asList(30, 60, 120));
+        ArrayList<String> values = new ArrayList<>(Arrays.asList("30 minutes", "1 hour", "2 hours"));
+        ArrayAdapter<String> delayAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, values);
+        delay.setAdapter(delayAdapter);
+        delay.setSelection(keys.indexOf(information.getDelay()));
+        delay.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                information.setDelay(keys.get(position));
+                FileManager.writeInfo(getApplicationContext(), information);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
         });
     }
 

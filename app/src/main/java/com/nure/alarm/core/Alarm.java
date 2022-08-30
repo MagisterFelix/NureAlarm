@@ -31,11 +31,11 @@ public class Alarm {
         AlarmWorkManager.periodicWork(context, delay);
     }
 
-    public static void setAlarm(Context context) {
+    public static void setAlarm(Context context, int hour, int minute) {
         Intent alarmIntent = new Intent(AlarmClock.ACTION_SET_ALARM);
         alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        alarmIntent.putExtra(AlarmClock.EXTRA_HOUR, 6);
-        alarmIntent.putExtra(AlarmClock.EXTRA_MINUTES, 0);
+        alarmIntent.putExtra(AlarmClock.EXTRA_HOUR, hour);
+        alarmIntent.putExtra(AlarmClock.EXTRA_MINUTES, minute);
         alarmIntent.putExtra(AlarmClock.EXTRA_SKIP_UI, SKIP_UI);
         context.startActivity(alarmIntent);
     }
