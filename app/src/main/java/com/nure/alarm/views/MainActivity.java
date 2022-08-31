@@ -33,6 +33,7 @@ import com.nure.alarm.views.dialogs.PermissionDialog;
 import com.nure.alarm.views.dialogs.ReceivingGroupsDialog;
 import com.nure.alarm.views.dialogs.UnavailableNetworkDialog;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,14 +41,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
 
     private Information information;
-
-    private Button settingTimeButton;
-    private TextView groupTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         Request request = new Request(getApplicationContext());
         request.getGroups(getSupportFragmentManager());
 
-        settingTimeButton = findViewById(R.id.setting_time_button);
+        Button settingTimeButton = findViewById(R.id.setting_time_button);
         if (information.getSettingHour() != -1 && information.getSettingMinute() != -1) {
             settingTimeButton.setText(String.format(Locale.getDefault(), "%02d:%02d", information.getSettingHour(), information.getSettingMinute()));
         }
@@ -82,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             timePickerDialog.show();
         });
 
-        groupTextView = findViewById(R.id.group);
+        TextView groupTextView = findViewById(R.id.group);
         if (information.getGroup().length() != 0) {
             try {
                 groupTextView.setText(information.getGroup().getString("name"));
@@ -95,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (groups.size() > 0) {
                 Dialog dialog = new Dialog(MainActivity.this);
-                dialog.setContentView(R.layout.spinner);
+                dialog.setContentView(R.layout.group_spinner);
 
                 int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.9);
                 int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.8);
@@ -105,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 dialog.show();
 
                 EditText editText = dialog.findViewById(R.id.edit_text);
-                ListView listView = dialog.findViewById(R.id.list_view);
+                ListView listView = dialog.findViewById(R.id.group_list_view);
 
                 ArrayList<String> sorted_groups = (ArrayList<String>) new ArrayList<>(groups.keySet()).stream().sorted().collect(Collectors.toList());
                 ArrayAdapter<String> groupAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, sorted_groups);
@@ -149,21 +148,70 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Spinner delay = findViewById(R.id.delay);
-        ArrayList<Integer> keys = new ArrayList<>(Arrays.asList(30, 60, 120));
-        ArrayList<String> values = new ArrayList<>(Arrays.asList("30 minutes", "1 hour", "2 hours"));
-        ArrayAdapter<String> delayAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, values);
+        ArrayList<Integer> delay_keys = new ArrayList<>(Arrays.asList(30, 60, 120));
+        ArrayList<String> delay_values = new ArrayList<>(Arrays.asList("30 minutes", "1 hour", "2 hours"));
+        ArrayAdapter<String> delayAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, delay_values);
         delay.setAdapter(delayAdapter);
-        delay.setSelection(keys.indexOf(information.getDelay()));
+        delay.setSelection(delay_keys.indexOf(information.getDelay()));
         delay.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                information.setDelay(keys.get(position));
+                information.setDelay(delay_keys.get(position));
                 FileManager.writeInfo(getApplicationContext(), information);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {}
         });
+
+        if (getIntent().getAction() != null && getIntent().getAction().equals("change")) {
+            TextView lessonTextView = findViewById(R.id.lesson);
+            lessonTextView.setOnClickListener(v -> {
+                Dialog dialog = new Dialog(MainActivity.this);
+                dialog.setContentView(R.layout.lesson_spinner);
+
+                int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.9);
+                int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.8);
+
+                dialog.getWindow().setLayout(width, height);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.setOnDismissListener(dialogInterface -> {
+                    try {
+                        TimeUnit.SECONDS.sleep(1);
+                        Alarm.cancelAlarm(getApplicationContext());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                });
+                dialog.show();
+
+                ListView listView = dialog.findViewById(R.id.lesson_list_view);
+
+                JSONArray lessons = FileManager.readInfo(getApplicationContext()).getLessons();
+                ArrayList<String> formatted_lessons = new ArrayList<>();
+                for (int i = 0; i < lessons.length(); ++i) {
+                    try {
+                        JSONObject jsonObject = lessons.getJSONObject(i);
+                        formatted_lessons.add("Lesson #" + jsonObject.getString("number") + " - " + jsonObject.getString("name"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                ArrayAdapter<String> groupAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, formatted_lessons);
+
+                listView.setAdapter(groupAdapter);
+                listView.setOnItemClickListener((parent, view, position, id) -> {
+                    try {
+                        Alarm.startAlarm(getApplicationContext(), lessons.getJSONObject(position), information.getDelay(), true);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    dialog.dismiss();
+                });
+            });
+            lessonTextView.performClick();
+        }
     }
 
     @Override
