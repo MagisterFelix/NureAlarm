@@ -6,7 +6,8 @@ import android.content.Intent;
 
 import androidx.core.app.NotificationManagerCompat;
 
-import com.nure.alarm.core.Alarm;
+import com.nure.alarm.core.FileManager;
+import com.nure.alarm.core.models.Information;
 import com.nure.alarm.views.MainActivity;
 
 public class AlarmNotificationReceiver extends BroadcastReceiver {
@@ -15,18 +16,22 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
 
+        Intent mainActivity = new Intent(context, MainActivity.class);
+        mainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mainActivity.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+
         if (action.equals("change")) {
-            Intent mainActivity = new Intent(context, MainActivity.class);
-            mainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            mainActivity.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             mainActivity.setAction("change");
-            context.startActivity(mainActivity);
         }
 
         if (action.equals("dismiss")) {
-            Alarm.disableAlarm(context);
+            Information information = FileManager.readInfo(context);
+            information.setStatus(false);
+            FileManager.writeInfo(context, information);
+            mainActivity.setAction("dismiss");
         }
 
+        context.startActivity(mainActivity);
         NotificationManagerCompat.from(context).cancel(1);
     }
 }

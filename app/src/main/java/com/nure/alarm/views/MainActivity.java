@@ -212,6 +212,16 @@ public class MainActivity extends AppCompatActivity {
             });
             lessonTextView.performClick();
         }
+
+        if (getIntent().getAction() != null && getIntent().getAction().equals("dismiss")) {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            Alarm.disableAlarm(getApplicationContext());
+        }
     }
 
     @Override
