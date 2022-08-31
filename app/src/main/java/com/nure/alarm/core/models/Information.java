@@ -9,13 +9,15 @@ public class Information {
     private int settingMinute;
     private JSONObject group;
     private JSONArray lessons;
+    private int delay;
 
-    public Information(boolean status, int settingHour, int settingMinute, JSONObject group, JSONArray lessons) {
+    public Information(boolean status, int settingHour, int settingMinute, JSONObject group, JSONArray lessons, int delay) {
         this.status = status;
         this.settingHour = settingHour;
         this.settingMinute = settingMinute;
         this.group = group;
         this.lessons = lessons;
+        this.delay = delay;
     }
 
     public boolean getStatus() {
@@ -53,4 +55,12 @@ public class Information {
     public JSONArray getLessons() { return lessons; }
 
     public void setLessons(JSONArray lessons) { this.lessons = lessons; }
+
+    public int getDelay() {
+        return delay;
+    }
+
+    public void setDelay(int delay) {
+        this.delay = delay;
+    }
 }

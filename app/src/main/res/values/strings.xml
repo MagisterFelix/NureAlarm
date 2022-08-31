@@ -1,10 +1,13 @@
 <resources>
     <string name="app_name">NureAlarm</string>
     <string name="status">Status</string>
-    <string name="select_time">Select time</string>
+    <string name="select_time">Time</string>
     <string name="label_alarm">Alarm setting time</string>
+    <string name="label_group">Your group</string>
+    <string name="label_delay">Alarm delay</string>
     <string name="permission_message">You must grant NureAlarm permission to display over other apps.</string>
     <string name="select_group">Select group</string>
+    <string name="select_lesson">Select lesson</string>
     <string name="search">Search…</string>
     <string name="receiving_groups_message">NureAlarm receives a list of groups, please wait a moment.</string>
     <string name="unavailable_network_message">In order to use NureAlarm you need a stable internet connection. Please connect to Wi-Fi or turn on the mobile network.</string>

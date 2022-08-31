@@ -1,20 +1,20 @@
 package com.nure.alarm.core.api;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
 import com.nure.alarm.R;
+import com.nure.alarm.core.Alarm;
 import com.nure.alarm.core.FileManager;
 import com.nure.alarm.core.SessionManager;
 import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.notification.AlarmNotification;
 import com.nure.alarm.views.dialogs.FailedGroupsRequestDialog;
 
 import org.json.JSONArray;
@@ -26,7 +26,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
@@ -84,7 +83,7 @@ public class Request {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                 try {
-                    JSONArray jsonArray = new JSONArray();
+                    JSONArray lessons = new JSONArray();
 
                     String html = Objects.requireNonNull(response.body()).string();
                     Document document = Jsoup.parse(html);
@@ -95,13 +94,19 @@ public class Request {
                             object.put("number", element.child(0).text());
                             object.put("time", element.child(1).text());
                             object.put("name", element.child(2).text());
-                            jsonArray.put(object);
+                            lessons.put(object);
                         }
                     }
 
                     Information information = FileManager.readInfo(context);
-                    information.setLessons(jsonArray);
+                    information.setLessons(lessons);
                     FileManager.writeInfo(context, information);
+
+                    if (lessons.length() == 0) {
+                        AlarmNotification.sendNotification(context, "No lessons!", false);
+                    } else {
+                        Alarm.startAlarm(context, lessons.getJSONObject(0), information.getDelay(), true);
+                    }
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }
@@ -110,8 +115,10 @@ public class Request {
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                 Information information = FileManager.readInfo(context);
-                information.setLessons(new JSONArray().put(R.string.failed_timetable_request_message));
+                information.setLessons(new JSONArray().put(context.getString(R.string.failed_timetable_request_message)));
                 FileManager.writeInfo(context, information);
+
+                AlarmNotification.sendNotification(context, context.getString(R.string.failed_timetable_request_message), false);
             }
         });
     }

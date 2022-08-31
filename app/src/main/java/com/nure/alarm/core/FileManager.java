@@ -26,6 +26,7 @@ public class FileManager {
     private static final int UNDEFINED_SETTING_MINUTE = -1;
     private static final JSONObject UNDEFINED_GROUP = new JSONObject();
     private static final JSONArray UNDEFINED_LESSONS = new JSONArray();
+    private static final int DEFAULT_DELAY = 30;
 
     private static void createIfNotExist(Context context, String file) {
         try {
@@ -79,13 +80,14 @@ public class FileManager {
                     object.getInt("settingHour"),
                     object.getInt("settingMinute"),
                     object.getJSONObject("group"),
-                    object.getJSONArray("lessons")
+                    object.getJSONArray("lessons"),
+                    object.getInt("delay")
             );
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        return new Information(STATUS_OFF, UNDEFINED_SETTING_HOUR, UNDEFINED_SETTING_MINUTE, UNDEFINED_GROUP, UNDEFINED_LESSONS);
+        return new Information(STATUS_OFF, UNDEFINED_SETTING_HOUR, UNDEFINED_SETTING_MINUTE, UNDEFINED_GROUP, UNDEFINED_LESSONS, DEFAULT_DELAY);
     }
 
     public static void writeInfo(Context context, Information information) {
@@ -96,6 +98,7 @@ public class FileManager {
             object.put("settingMinute", information.getSettingMinute());
             object.put("group", information.getGroup());
             object.put("lessons", information.getLessons());
+            object.put("delay", information.getDelay());
             writeJSON(context, object, INFO_FILE);
         } catch (JSONException e) {
             e.printStackTrace();
