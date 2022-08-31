@@ -11,30 +11,37 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.nure.alarm.R;
-
-import org.json.JSONArray;
+import com.nure.alarm.views.MainActivity;
 
 public class AlarmNotification {
 
-    public static void sendNotification(Context context, String message, JSONArray lessons) {
+    public static void sendNotification(Context context, String message, boolean haveLessons) {
         NotificationChannel channel = new NotificationChannel("alarm_channel", "Alarm Notification", NotificationManager.IMPORTANCE_DEFAULT);
         NotificationManager manager = context.getSystemService(NotificationManager.class);
         manager.createNotificationChannel(channel);
+
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0,
+                new Intent(context, MainActivity.class),
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "alarm_channel")
                 .setSmallIcon(R.drawable.ic_notification)
+                .setAutoCancel(true)
+                .setContentIntent(resultPendingIntent)
                 .setContentTitle("NureAlarm")
                 .setContentText(message);
-        if (lessons != null) {
-            Intent intent = new Intent(context, AlarmNotificationReceiver.class);
-            intent.setAction("dismiss");
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                    context,
-                    0,
-                    intent,
+        if (haveLessons) {
+            PendingIntent changePendingIntent = PendingIntent.getBroadcast(context, 0,
+                    new Intent(context, AlarmNotificationReceiver.class).setAction("change"),
                     PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-            builder.addAction(R.drawable.ic_dismiss, "Dismiss", pendingIntent);
+            builder.addAction(R.drawable.ic_lesson, "Change lesson", changePendingIntent);
+
+            PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 0,
+                    new Intent(context, AlarmNotificationReceiver.class).setAction("dismiss"),
+                    PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+            builder.addAction(R.drawable.ic_dismiss, "Dismiss", dismissPendingIntent);
         }
         Notification notification = builder.build();
+
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
         notificationManagerCompat.notify(1, notification);
     }

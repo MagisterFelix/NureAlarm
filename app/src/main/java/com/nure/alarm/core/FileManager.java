@@ -26,7 +26,7 @@ public class FileManager {
     private static final int UNDEFINED_SETTING_MINUTE = -1;
     private static final JSONObject UNDEFINED_GROUP = new JSONObject();
     private static final JSONArray UNDEFINED_LESSONS = new JSONArray();
-    private static final int UNDEFINED_DELAY = 30;
+    private static final int DEFAULT_DELAY = 30;
 
     private static void createIfNotExist(Context context, String file) {
         try {
@@ -87,7 +87,7 @@ public class FileManager {
             e.printStackTrace();
         }
 
-        return new Information(STATUS_OFF, UNDEFINED_SETTING_HOUR, UNDEFINED_SETTING_MINUTE, UNDEFINED_GROUP, UNDEFINED_LESSONS, UNDEFINED_DELAY);
+        return new Information(STATUS_OFF, UNDEFINED_SETTING_HOUR, UNDEFINED_SETTING_MINUTE, UNDEFINED_GROUP, UNDEFINED_LESSONS, DEFAULT_DELAY);
     }
 
     public static void writeInfo(Context context, Information information) {

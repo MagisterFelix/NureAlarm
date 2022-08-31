@@ -26,8 +26,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
@@ -105,21 +103,11 @@ public class Request {
                     FileManager.writeInfo(context, information);
 
                     if (lessons.length() == 0) {
-                        AlarmNotification.sendNotification(context, "No lessons!", null);
+                        AlarmNotification.sendNotification(context, "No lessons!", false);
                     } else {
-                        JSONObject lesson =  lessons.getJSONObject(0);
-                        String string_time = lesson.getString("time").split(" ")[0];
-                        Calendar time = Calendar.getInstance();
-                        time.setTime(Objects.requireNonNull(new SimpleDateFormat("HH:mm", Locale.getDefault()).parse(string_time)));
-                        time.add(Calendar.MILLISECOND, -(information.getDelay() * 60000));
-
-                        Alarm.setAlarm(context, time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE));
-
-                        String unformatted_message = "Alarm clock set for %s lesson - %s";
-                        String message = String.format(Locale.getDefault(), unformatted_message, lesson.getString("number"), lesson.getString("name"));
-                        AlarmNotification.sendNotification(context, message, lessons);
+                        Alarm.startAlarm(context, lessons.getJSONObject(0), information.getDelay(), true);
                     }
-                } catch (IOException | JSONException | ParseException e) {
+                } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -130,7 +118,7 @@ public class Request {
                 information.setLessons(new JSONArray().put(context.getString(R.string.failed_timetable_request_message)));
                 FileManager.writeInfo(context, information);
 
-                AlarmNotification.sendNotification(context, context.getString(R.string.failed_timetable_request_message), null);
+                AlarmNotification.sendNotification(context, context.getString(R.string.failed_timetable_request_message), false);
             }
         });
     }

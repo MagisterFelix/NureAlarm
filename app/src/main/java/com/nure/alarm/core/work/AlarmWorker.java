@@ -21,21 +21,28 @@ public class AlarmWorker extends Worker {
         super(context, workerParams);
     }
 
-    @NonNull
-    @Override
-    public Result doWork() {
+    private String getDate() {
         Calendar date = Calendar.getInstance();
         if (date.get(Calendar.HOUR_OF_DAY) > 7) {
             date.add(Calendar.DATE, 1);
         }
-        String date_formatted = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date.getTime());
+        return new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date.getTime());
+    }
+
+    private void makeRequest() {
+        String date = getDate();
         try {
             Request request = new Request(getApplicationContext());
-            request.getTimeTable(date_formatted, date_formatted, FileManager.readInfo(getApplicationContext()).getGroup().getLong("id"));
+            request.getTimeTable(date, date, FileManager.readInfo(getApplicationContext()).getGroup().getLong("id"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
 
+    @NonNull
+    @Override
+    public Result doWork() {
+        makeRequest();
         return Result.success();
     }
 }
