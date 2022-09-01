@@ -33,6 +33,7 @@ import com.nure.alarm.core.SessionManager;
 import com.nure.alarm.core.api.Request;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.network.NetworkStatus;
+import com.nure.alarm.views.dialogs.HelpDialog;
 import com.nure.alarm.views.dialogs.NotSpecifiedInformationDialog;
 import com.nure.alarm.views.dialogs.PermissionDialog;
 import com.nure.alarm.views.dialogs.ReceivingGroupsDialog;
@@ -243,6 +244,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
+
+        MenuItem help = menu.findItem(R.id.help);
+        help.setOnMenuItemClickListener(menuItem -> {
+            HelpDialog helpDialog = new HelpDialog();
+            helpDialog.show(getSupportFragmentManager(), "HelpDialog");
+            return true;
+        });
 
         MenuItem locale = menu.findItem(R.id.locale);
         locale.setIcon(sessionManager.fetchLocale().equals("uk") ? R.mipmap.ic_uk : R.mipmap.ic_en);

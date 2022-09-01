@@ -21,4 +21,6 @@
         <item>2 hours</item>
     </string-array>
     <string name="locale">Locale</string>
+    <string name="help">Help</string>
+    <string name="help_message"><b>Alarm setting time</b> - you choose the time at which the alarm will be set. For example: if 20:00 is set, then every day at 20:00 the alarm will be set for the first lesson and you will receive a notification.\n\n<b>Group</b> - you choose the group in which you study.\n\n<b>Delay</b> - you choose how many minutes/hours before the lesson the alarm will go off. For example: if 30 minutes is set and the lesson starts at 11:15, then the alarm will be set to 10:45.\n\n</string>
 </resources>
