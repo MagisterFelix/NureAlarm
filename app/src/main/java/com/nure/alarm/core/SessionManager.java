@@ -11,6 +11,7 @@ public class SessionManager {
     private final SharedPreferences sharedPreferences;
 
     private static final String KEY_TIME = "time";
+    private static final String KEY_LOCALE = "locale";
 
     public SessionManager(Context context) {
         sharedPreferences = context.getSharedPreferences(context.getString(R.string.app_name), Context.MODE_PRIVATE);
@@ -26,5 +27,15 @@ public class SessionManager {
         Calendar fromStart = Calendar.getInstance();
         fromStart.setTimeInMillis(0);
         return sharedPreferences.getLong(KEY_TIME, fromStart.getTimeInMillis());
+    }
+
+    public void saveLocale(String locale) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_LOCALE, locale);
+        editor.apply();
+    }
+
+    public String fetchLocale() {
+        return sharedPreferences.getString(KEY_LOCALE, "en");
     }
 }

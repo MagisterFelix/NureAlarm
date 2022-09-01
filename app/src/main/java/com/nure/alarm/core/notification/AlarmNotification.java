@@ -25,10 +25,10 @@ public class AlarmNotification {
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "alarm_channel")
                 .setSmallIcon(R.drawable.ic_notification)
-                .setAutoCancel(true)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setContentIntent(resultPendingIntent)
                 .setContentTitle("NureAlarm")
-                .setContentText(message);
+                .setAutoCancel(true);
         if (haveLessons) {
             PendingIntent changePendingIntent = PendingIntent.getBroadcast(context, 0,
                     new Intent(context, AlarmNotificationReceiver.class).setAction("change"),

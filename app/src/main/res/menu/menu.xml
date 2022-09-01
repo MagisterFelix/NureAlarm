@@ -3,9 +3,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/help"
+        android:title="@string/help"
+        android:icon="@drawable/ic_help"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/locale"
+        android:title="@string/locale"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/switchStatus"
         android:actionLayout="@layout/switch_layout"
         android:title="@string/status"
         app:showAsAction="always"
         app:actionViewClass="com.google.android.material.switchmaterial.SwitchMaterial" />
+
 </menu>
