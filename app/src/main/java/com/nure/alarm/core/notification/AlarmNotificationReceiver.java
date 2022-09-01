@@ -19,6 +19,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
         Intent mainActivity = new Intent(context, MainActivity.class);
         mainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mainActivity.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         if (action.equals("change")) {
             mainActivity.setAction("change");

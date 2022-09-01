@@ -222,12 +222,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (getIntent().getAction() != null && getIntent().getAction().equals("dismiss")) {
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
             Alarm.disableAlarm(getApplicationContext());
         }
     }
@@ -261,6 +255,8 @@ public class MainActivity extends AppCompatActivity {
                 sessionManager.saveLocale("en");
             }
             locale.setIcon(sessionManager.fetchLocale().equals("uk") ? R.mipmap.ic_uk : R.mipmap.ic_en);
+            finish();
+            overridePendingTransition(0, 0);
             startActivity(new Intent(getApplicationContext(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
             return true;
         });
