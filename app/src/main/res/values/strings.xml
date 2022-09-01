@@ -1,10 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NureAlarm</string>
     <string name="status">Status</string>
     <string name="select_time">Time</string>
     <string name="label_alarm">Alarm setting time</string>
-    <string name="label_group">Your group</string>
-    <string name="label_delay">Alarm delay</string>
+    <string name="label_group">Group</string>
+    <string name="label_delay">Delay</string>
     <string name="permission_message">You must grant NureAlarm permission to display over other apps.</string>
     <string name="select_group">Select group</string>
     <string name="select_lesson">Select lesson</string>
@@ -14,4 +15,10 @@
     <string name="failed_groups_request_message">Failed to get list of groups. You may have a poor internet connection or the cist.nure.ua is not responding.</string>
     <string name="not_specified_information">To start the application, you must specify the alarm setting time and group.</string>
     <string name="failed_timetable_request_message">Failed to get list of lessons. You may have a poor internet connection or the cist.nure.ua is not responding.</string>
+    <string-array name="delay">
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>2 hours</item>
+    </string-array>
+    <string name="locale">Locale</string>
 </resources>

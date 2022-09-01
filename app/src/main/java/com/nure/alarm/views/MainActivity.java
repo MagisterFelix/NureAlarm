@@ -2,6 +2,9 @@ package com.nure.alarm.views;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -9,6 +12,7 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -25,6 +29,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.nure.alarm.R;
 import com.nure.alarm.core.Alarm;
 import com.nure.alarm.core.FileManager;
+import com.nure.alarm.core.SessionManager;
 import com.nure.alarm.core.api.Request;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.network.NetworkStatus;
@@ -47,6 +52,7 @@ import java.util.stream.Collectors;
 public class MainActivity extends AppCompatActivity {
 
     private Information information;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         information = FileManager.readInfo(getApplicationContext());
+        sessionManager = new SessionManager(getApplicationContext());
 
         Request request = new Request(getApplicationContext());
         request.getGroups(getSupportFragmentManager());
@@ -149,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
 
         Spinner delay = findViewById(R.id.delay);
         ArrayList<Integer> delay_keys = new ArrayList<>(Arrays.asList(30, 60, 120));
-        ArrayList<String> delay_values = new ArrayList<>(Arrays.asList("30 minutes", "1 hour", "2 hours"));
+        ArrayList<String> delay_values = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.delay)));
         ArrayAdapter<String> delayAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, delay_values);
         delay.setAdapter(delayAdapter);
         delay.setSelection(delay_keys.indexOf(information.getDelay()));
@@ -225,8 +232,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void attachBaseContext(Context base) {
+        Locale locale = new Locale(new SessionManager(base).fetchLocale());
+        Locale.setDefault(locale);
+        Configuration configuration = base.getResources().getConfiguration();
+        configuration.setLocale(locale);
+        super.attachBaseContext(base.createConfigurationContext(configuration));
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
+
+        MenuItem locale = menu.findItem(R.id.locale);
+        locale.setIcon(sessionManager.fetchLocale().equals("uk") ? R.mipmap.ic_uk : R.mipmap.ic_en);
+        locale.setOnMenuItemClickListener(menuItem -> {
+            if (sessionManager.fetchLocale().equals("en")) {
+                sessionManager.saveLocale("uk");
+            } else {
+                sessionManager.saveLocale("en");
+            }
+            locale.setIcon(sessionManager.fetchLocale().equals("uk") ? R.mipmap.ic_uk : R.mipmap.ic_en);
+            startActivity(new Intent(getApplicationContext(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
+            return true;
+        });
 
         SwitchMaterial switchMaterial = menu.findItem(R.id.switchStatus).getActionView().findViewById(R.id.switchStatus);
         switchMaterial.setChecked(information.getStatus());
