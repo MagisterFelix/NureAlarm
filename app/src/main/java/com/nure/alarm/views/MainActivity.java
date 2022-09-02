@@ -76,6 +76,11 @@ public class MainActivity extends AppCompatActivity {
                 information.setSettingMinute(selectedMinute);
                 FileManager.writeInfo(getApplicationContext(), information);
 
+                if (information.getStatus()) {
+                    Alarm.disableAlarmWork(getApplicationContext());
+                    Alarm.enableAlarmWork(getApplicationContext(), information);
+                }
+
                 settingTimeButton.setText(String.format(Locale.getDefault(), "%02d:%02d", information.getSettingHour(), information.getSettingMinute()));
             };
 
@@ -210,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
                 listView.setAdapter(groupAdapter);
                 listView.setOnItemClickListener((parent, view, position, id) -> {
                     try {
-                        Alarm.startAlarm(getApplicationContext(), lessons.getJSONObject(position), information.getDelay(), true);
+                        Alarm.startAlarm(getApplicationContext(), lessons.getJSONObject(position), information.getDelay());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -222,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (getIntent().getAction() != null && getIntent().getAction().equals("dismiss")) {
-            Alarm.disableAlarm(getApplicationContext());
+            Alarm.disableAlarmWork(getApplicationContext());
         }
     }
 
@@ -282,9 +287,9 @@ public class MainActivity extends AppCompatActivity {
                         FileManager.writeInfo(getApplicationContext(), information);
 
                         if (isChecked) {
-                            Alarm.enableAlarm(getApplicationContext(), information);
+                            Alarm.enableAlarmWork(getApplicationContext(), information);
                         } else {
-                            Alarm.disableAlarm(getApplicationContext());
+                            Alarm.disableAlarmWork(getApplicationContext());
                         }
                     } else{
                         compoundButton.setChecked(false);

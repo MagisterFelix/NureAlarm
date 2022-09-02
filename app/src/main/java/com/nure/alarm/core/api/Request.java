@@ -105,7 +105,7 @@ public class Request {
                     if (lessons.length() == 0) {
                         AlarmNotification.sendNotification(context, "No lessons!", false);
                     } else {
-                        Alarm.startAlarm(context, lessons.getJSONObject(0), information.getDelay(), true);
+                        Alarm.startAlarm(context, lessons.getJSONObject(0), information.getDelay());
                     }
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();

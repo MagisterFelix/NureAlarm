@@ -52,9 +52,13 @@ public class Information {
         this.group = group;
     }
 
-    public JSONArray getLessons() { return lessons; }
+    public JSONArray getLessons() {
+        return lessons;
+    }
 
-    public void setLessons(JSONArray lessons) { this.lessons = lessons; }
+    public void setLessons(JSONArray lessons) {
+        this.lessons = lessons;
+    }
 
     public int getDelay() {
         return delay;

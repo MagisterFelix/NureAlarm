@@ -22,23 +22,6 @@ public class Alarm {
     private final static int ONE_DAY = 1;
     private final static boolean SKIP_UI = true;
 
-    public static void enableAlarm(Context context, Information information) {
-        Calendar now = Calendar.getInstance();
-
-        Calendar startTime = Calendar.getInstance();
-        startTime.set(Calendar.HOUR_OF_DAY, information.getSettingHour());
-        startTime.set(Calendar.MINUTE, information.getSettingMinute());
-        startTime.set(Calendar.SECOND, ZERO_SECONDS);
-
-        if (startTime.before(now) || startTime.equals(now)) {
-            startTime.add(Calendar.DATE, ONE_DAY);
-            AlarmWorkManager.oneTimeWork(context);
-        }
-
-        long delay = startTime.getTimeInMillis() - now.getTimeInMillis();
-        AlarmWorkManager.periodicWork(context, delay);
-    }
-
     public static void setAlarm(Context context, int hour, int minute) {
         Intent alarmIntent = new Intent(AlarmClock.ACTION_SET_ALARM);
         alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -55,12 +38,29 @@ public class Alarm {
         context.startActivity(alarmIntent);
     }
 
-    public static void disableAlarm(Context context) {
+    public static void enableAlarmWork(Context context, Information information) {
+        Calendar now = Calendar.getInstance();
+
+        Calendar startTime = Calendar.getInstance();
+        startTime.set(Calendar.HOUR_OF_DAY, information.getSettingHour());
+        startTime.set(Calendar.MINUTE, information.getSettingMinute());
+        startTime.set(Calendar.SECOND, ZERO_SECONDS);
+
+        if (startTime.before(now) || startTime.equals(now)) {
+            startTime.add(Calendar.DATE, ONE_DAY);
+            AlarmWorkManager.oneTimeWork(context);
+        }
+
+        long delay = startTime.getTimeInMillis() - now.getTimeInMillis();
+        AlarmWorkManager.periodicWork(context, delay);
+    }
+
+    public static void disableAlarmWork(Context context) {
         AlarmWorkManager.cancelWork(context);
         cancelAlarm(context);
     }
 
-    public static void startAlarm(Context context, JSONObject lesson, int delay, boolean haveLessons) {
+    public static void startAlarm(Context context, JSONObject lesson, int delay) {
         try {
             String string_time = lesson.getString("time").split(" ")[0];
             Calendar time = Calendar.getInstance();
@@ -71,7 +71,7 @@ public class Alarm {
 
             String unformatted_message = "Alarm clock set for %s lesson - %s";
             String message = String.format(Locale.getDefault(), unformatted_message, lesson.getString("number"), lesson.getString("name"));
-            AlarmNotification.sendNotification(context, message, haveLessons);
+            AlarmNotification.sendNotification(context, message, true);
         } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }
