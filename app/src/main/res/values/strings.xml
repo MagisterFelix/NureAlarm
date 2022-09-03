@@ -15,6 +15,7 @@
     <string name="failed_groups_request_message">Failed to get list of groups. You may have a poor internet connection or the cist.nure.ua is not responding.</string>
     <string name="not_specified_information">To start the application, you must specify the alarm setting time and group.</string>
     <string name="failed_timetable_request_message">Failed to get list of lessons. You may have a poor internet connection or the cist.nure.ua is not responding.</string>
+    <string name="remove_alarm_message">Remove set/previous alarm.</string>
     <string-array name="delay">
         <item>30 minutes</item>
         <item>1 hour</item>

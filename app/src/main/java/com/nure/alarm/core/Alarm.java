@@ -2,8 +2,11 @@ package com.nure.alarm.core;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.provider.AlarmClock;
+import android.widget.Toast;
 
+import com.nure.alarm.R;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.notification.AlarmNotification;
 import com.nure.alarm.core.work.AlarmWorkManager;
@@ -33,6 +36,10 @@ public class Alarm {
     }
 
     public static void cancelAlarm(Context context) {
+        Configuration configuration = new Configuration(context.getResources().getConfiguration());
+        configuration.setLocale(new Locale(new SessionManager(context).fetchLocale()));
+        Toast.makeText(context, context.createConfigurationContext(configuration).getString(R.string.remove_alarm_message), Toast.LENGTH_LONG).show();
+
         Intent alarmIntent = new Intent(AlarmClock.ACTION_DISMISS_ALARM);
         alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(alarmIntent);
