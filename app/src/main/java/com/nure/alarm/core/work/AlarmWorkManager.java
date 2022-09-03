@@ -3,6 +3,7 @@ package com.nure.alarm.core.work;
 import android.content.Context;
 
 import androidx.work.Constraints;
+import androidx.work.ExistingWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
@@ -22,10 +23,10 @@ public class AlarmWorkManager {
                 .addTag(ALARM_WORK_TAG)
                 .build();
 
-        WorkManager.getInstance(context).enqueue(request);
+        WorkManager.getInstance(context).enqueueUniqueWork(ALARM_WORK_TAG, ExistingWorkPolicy.REPLACE, request);
     }
 
     public static void cancelWork(Context context) {
-        WorkManager.getInstance(context).cancelAllWorkByTag(ALARM_WORK_TAG);
+        WorkManager.getInstance(context).cancelUniqueWork(ALARM_WORK_TAG);
     }
 }
