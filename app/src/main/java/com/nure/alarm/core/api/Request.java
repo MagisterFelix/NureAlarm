@@ -100,6 +100,7 @@ public class Request {
 
                     Information information = FileManager.readInfo(context);
                     information.setLessons(lessons);
+                    information.setSet(lessons.length() != 0);
                     FileManager.writeInfo(context, information);
 
                     if (lessons.length() == 0) {

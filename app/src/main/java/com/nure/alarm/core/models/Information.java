@@ -5,14 +5,16 @@ import org.json.JSONObject;
 
 public class Information {
     private boolean status;
+    private boolean isSet;
     private int settingHour;
     private int settingMinute;
     private JSONObject group;
     private JSONArray lessons;
     private int delay;
 
-    public Information(boolean status, int settingHour, int settingMinute, JSONObject group, JSONArray lessons, int delay) {
+    public Information(boolean status, boolean isSet, int settingHour, int settingMinute, JSONObject group, JSONArray lessons, int delay) {
         this.status = status;
+        this.isSet = isSet;
         this.settingHour = settingHour;
         this.settingMinute = settingMinute;
         this.group = group;
@@ -27,6 +29,10 @@ public class Information {
     public void setStatus(boolean status) {
         this.status = status;
     }
+
+    public boolean isSet() { return isSet; }
+
+    public void setSet(boolean set) { this.isSet = set; }
 
     public int getSettingHour() {
         return settingHour;

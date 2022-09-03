@@ -54,9 +54,13 @@ public class Alarm {
         AlarmWorkManager.startWork(context, delay);
     }
 
-    public static void disableAlarmWork(Context context) {
+    public static void disableAlarmWork(Context context, Information information) {
         AlarmWorkManager.cancelWork(context);
-        cancelAlarm(context);
+        if (information.isSet()) {
+            information.setSet(false);
+            FileManager.writeInfo(context, information);
+            cancelAlarm(context);
+        }
     }
 
     public static void startAlarm(Context context, JSONObject lesson, int delay) {

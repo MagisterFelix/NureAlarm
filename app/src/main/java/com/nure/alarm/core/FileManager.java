@@ -22,6 +22,7 @@ public class FileManager {
     private static final String GROUPS_FILE = "groups.json";
 
     private static final boolean STATUS_OFF = false;
+    private static final boolean IS_NOT_SET = false;
     private static final int UNDEFINED_SETTING_HOUR = -1;
     private static final int UNDEFINED_SETTING_MINUTE = -1;
     private static final JSONObject UNDEFINED_GROUP = new JSONObject();
@@ -77,6 +78,7 @@ public class FileManager {
 
             return new Information(
                     object.getBoolean("status"),
+                    object.getBoolean("isSet"),
                     object.getInt("settingHour"),
                     object.getInt("settingMinute"),
                     object.getJSONObject("group"),
@@ -87,13 +89,14 @@ public class FileManager {
             e.printStackTrace();
         }
 
-        return new Information(STATUS_OFF, UNDEFINED_SETTING_HOUR, UNDEFINED_SETTING_MINUTE, UNDEFINED_GROUP, UNDEFINED_LESSONS, DEFAULT_DELAY);
+        return new Information(STATUS_OFF, IS_NOT_SET, UNDEFINED_SETTING_HOUR, UNDEFINED_SETTING_MINUTE, UNDEFINED_GROUP, UNDEFINED_LESSONS, DEFAULT_DELAY);
     }
 
     public static void writeInfo(Context context, Information information) {
         try {
             JSONObject object = new JSONObject();
             object.put("status", information.getStatus());
+            object.put("isSet", information.isSet());
             object.put("settingHour", information.getSettingHour());
             object.put("settingMinute", information.getSettingMinute());
             object.put("group", information.getGroup());

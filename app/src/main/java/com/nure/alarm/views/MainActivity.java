@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 FileManager.writeInfo(getApplicationContext(), information);
 
                 if (information.getStatus()) {
-                    Alarm.disableAlarmWork(getApplicationContext());
+                    Alarm.disableAlarmWork(getApplicationContext(), information);
                     Alarm.enableAlarmWork(getApplicationContext(), information);
                 }
 
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (getIntent().getAction() != null && getIntent().getAction().equals("dismiss")) {
-            Alarm.disableAlarmWork(getApplicationContext());
+            Alarm.disableAlarmWork(getApplicationContext(), information);
         }
     }
 
@@ -269,6 +269,8 @@ public class MainActivity extends AppCompatActivity {
         SwitchMaterial switchMaterial = menu.findItem(R.id.switchStatus).getActionView().findViewById(R.id.switchStatus);
         switchMaterial.setChecked(information.getStatus());
         switchMaterial.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            information = FileManager.readInfo(getApplicationContext());
+
             if (!Settings.canDrawOverlays(MainActivity.this)) {
                 compoundButton.setChecked(false);
                 PermissionDialog permissionDialog = new PermissionDialog();
@@ -289,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
                         if (isChecked) {
                             Alarm.enableAlarmWork(getApplicationContext(), information);
                         } else {
-                            Alarm.disableAlarmWork(getApplicationContext());
+                            Alarm.disableAlarmWork(getApplicationContext(), information);
                         }
                     } else{
                         compoundButton.setChecked(false);
