@@ -17,6 +17,7 @@
     <string name="failed_timetable_request_message">Failed to get list of lessons. You may have a poor internet connection or the cist.nure.ua is not responding.</string>
     <string name="remove_alarm_message">Remove set/previous alarm.</string>
     <string-array name="delay">
+        <item>10 minutes</item>
         <item>30 minutes</item>
         <item>1 hour</item>
         <item>2 hours</item>

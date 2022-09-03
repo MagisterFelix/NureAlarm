@@ -17,6 +17,7 @@
     <string name="failed_timetable_request_message">Не вдалося отримати список занять. Можливо, у вас погане інтернет-з’єднання або cist.nure.ua не відповідає.</string>
     <string name="remove_alarm_message">Приберiть встановлений/попередній будильник.</string>
     <string-array name="delay">
+        <item>10 хвилин</item>
         <item>30 хвилин</item>
         <item>1 година</item>
         <item>2 години</item>

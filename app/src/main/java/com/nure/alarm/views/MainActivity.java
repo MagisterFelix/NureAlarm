@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Spinner delay = findViewById(R.id.delay);
-        ArrayList<Integer> delay_keys = new ArrayList<>(Arrays.asList(30, 60, 120));
+        ArrayList<Integer> delay_keys = new ArrayList<>(Arrays.asList(10, 30, 60, 120));
         ArrayList<String> delay_values = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.delay)));
         ArrayAdapter<String> delayAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, delay_values);
         delay.setAdapter(delayAdapter);
