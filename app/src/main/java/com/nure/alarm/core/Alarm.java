@@ -46,13 +46,12 @@ public class Alarm {
         startTime.set(Calendar.MINUTE, information.getSettingMinute());
         startTime.set(Calendar.SECOND, ZERO_SECONDS);
 
-        if (startTime.before(now) || startTime.equals(now)) {
+        if (startTime.before(now)) {
             startTime.add(Calendar.DATE, ONE_DAY);
-            AlarmWorkManager.oneTimeWork(context);
         }
 
         long delay = startTime.getTimeInMillis() - now.getTimeInMillis();
-        AlarmWorkManager.periodicWork(context, delay);
+        AlarmWorkManager.startWork(context, delay);
     }
 
     public static void disableAlarmWork(Context context) {
