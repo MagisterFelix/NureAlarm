@@ -198,6 +198,10 @@ public class MainActivity extends AppCompatActivity {
                 });
                 dialog.show();
 
+                Configuration configuration = new Configuration(getApplicationContext().getResources().getConfiguration());
+                configuration.setLocale(new Locale(new SessionManager(getApplicationContext()).fetchLocale()));
+                Context context = getApplicationContext().createConfigurationContext(configuration);
+
                 ListView listView = dialog.findViewById(R.id.lesson_list_view);
 
                 JSONArray lessons = FileManager.readInfo(getApplicationContext()).getLessons();
@@ -205,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < lessons.length(); ++i) {
                     try {
                         JSONObject jsonObject = lessons.getJSONObject(i);
-                        formatted_lessons.add("Lesson #" + jsonObject.getString("number") + " - " + jsonObject.getString("name"));
+                        formatted_lessons.add(context.getString(R.string.lesson_number) + jsonObject.getString("number") + " - " + jsonObject.getString("name"));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -215,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                 listView.setAdapter(groupAdapter);
                 listView.setOnItemClickListener((parent, view, position, id) -> {
                     try {
-                        Alarm.startAlarm(getApplicationContext(), lessons.getJSONObject(position), information.getDelay());
+                        Alarm.startAlarm(context, lessons.getJSONObject(position), information.getDelay());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

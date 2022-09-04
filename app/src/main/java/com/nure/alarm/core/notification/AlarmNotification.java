@@ -15,34 +15,40 @@ import com.nure.alarm.views.MainActivity;
 
 public class AlarmNotification {
 
+    public static final int NOTIFICATION_ID = 1;
+    private static final String NOTIFICATION_CHANNEL = "alarm_channel";
+    private static final String NOTIFICATION_NAME = "Alarm Notification";
+
     public static void sendNotification(Context context, String message, boolean haveLessons) {
-        NotificationChannel channel = new NotificationChannel("alarm_channel", "Alarm Notification", NotificationManager.IMPORTANCE_DEFAULT);
+        NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL, NOTIFICATION_NAME, NotificationManager.IMPORTANCE_DEFAULT);
         NotificationManager manager = context.getSystemService(NotificationManager.class);
         manager.createNotificationChannel(channel);
 
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0,
                 new Intent(context, MainActivity.class),
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "alarm_channel")
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setContentIntent(resultPendingIntent)
-                .setContentTitle("NureAlarm")
+                .setContentTitle(context.getString(R.string.alarm))
                 .setAutoCancel(true);
+
         if (haveLessons) {
             PendingIntent changePendingIntent = PendingIntent.getBroadcast(context, 0,
                     new Intent(context, AlarmNotificationReceiver.class).setAction("change"),
                     PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-            builder.addAction(R.drawable.ic_lesson, "Change lesson", changePendingIntent);
+            builder.addAction(R.drawable.ic_lesson, context.getString(R.string.change_lesson), changePendingIntent);
 
             PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 0,
                     new Intent(context, AlarmNotificationReceiver.class).setAction("dismiss"),
                     PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-            builder.addAction(R.drawable.ic_dismiss, "Dismiss", dismissPendingIntent);
+            builder.addAction(R.drawable.ic_dismiss, context.getString(R.string.dismiss), dismissPendingIntent);
         }
         Notification notification = builder.build();
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
-        notificationManagerCompat.notify(1, notification);
+        notificationManagerCompat.notify(NOTIFICATION_ID, notification);
     }
 }

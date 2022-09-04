@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NureAlarm</string>
+    <string name="alarm">Alarm clock</string>
     <string name="status">Status</string>
     <string name="select_time">Time</string>
     <string name="label_alarm">Alarm setting time</string>
@@ -9,6 +10,8 @@
     <string name="permission_message">You must grant NureAlarm permission to display over other apps.</string>
     <string name="select_group">Select group</string>
     <string name="select_lesson">Select lesson</string>
+    <string name="change_lesson">Change lesson</string>
+    <string name="dismiss">Dismiss</string>
     <string name="search">Search…</string>
     <string name="receiving_groups_message">NureAlarm receives a list of groups, please wait a moment.</string>
     <string name="unavailable_network_message">In order to use NureAlarm you need a stable internet connection. Please connect to Wi-Fi or turn on the mobile network.</string>
@@ -16,6 +19,9 @@
     <string name="not_specified_information">To start the application, you must specify the alarm setting time and group.</string>
     <string name="failed_timetable_request_message">Failed to get list of lessons. You may have a poor internet connection or the cist.nure.ua is not responding.</string>
     <string name="remove_alarm_message">Remove set/previous alarm.</string>
+    <string name="lessons_message">Set for %s lesson - %s</string>
+    <string name="no_lessons">No lessons!</string>
+    <string name="lesson_number">Lesson #</string>
     <string-array name="delay">
         <item>10 minutes</item>
         <item>30 minutes</item>

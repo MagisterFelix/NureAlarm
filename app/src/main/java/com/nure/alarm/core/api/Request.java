@@ -1,6 +1,7 @@
 package com.nure.alarm.core.api;
 
 import android.content.Context;
+import android.content.res.Configuration;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
@@ -42,7 +43,10 @@ public class Request {
     private final SessionManager sessionManager;
 
     public Request(Context context) {
-        this.context = context;
+        Configuration configuration = new Configuration(context.getResources().getConfiguration());
+        configuration.setLocale(new Locale(new SessionManager(context).fetchLocale()));
+
+        this.context = context.createConfigurationContext(configuration);
         this.apiClient = new ApiClient();
         this.sessionManager = new SessionManager(context);
     }
@@ -104,7 +108,7 @@ public class Request {
                     FileManager.writeInfo(context, information);
 
                     if (lessons.length() == 0) {
-                        AlarmNotification.sendNotification(context, "No lessons!", false);
+                        AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), false);
                     } else {
                         Alarm.startAlarm(context, lessons.getJSONObject(0), information.getDelay());
                     }

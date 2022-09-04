@@ -6,8 +6,6 @@ import android.content.Intent;
 
 import androidx.core.app.NotificationManagerCompat;
 
-import com.nure.alarm.core.FileManager;
-import com.nure.alarm.core.models.Information;
 import com.nure.alarm.views.MainActivity;
 
 public class AlarmNotificationReceiver extends BroadcastReceiver {
@@ -20,19 +18,9 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
         mainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mainActivity.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-        if (action.equals("change")) {
-            mainActivity.setAction("change");
-        }
-
-        if (action.equals("dismiss")) {
-            Information information = FileManager.readInfo(context);
-            information.setStatus(false);
-            FileManager.writeInfo(context, information);
-            mainActivity.setAction("dismiss");
-        }
-
+        mainActivity.setAction(action);
         context.startActivity(mainActivity);
-        NotificationManagerCompat.from(context).cancel(1);
+
+        NotificationManagerCompat.from(context).cancel(AlarmNotification.NOTIFICATION_ID);
     }
 }

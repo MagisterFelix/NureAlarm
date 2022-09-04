@@ -79,7 +79,7 @@ public class Alarm {
 
             Alarm.setAlarm(context, time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE));
 
-            String unformatted_message = "Alarm clock set for %s lesson - %s";
+            String unformatted_message = context.getString(R.string.lessons_message);
             String message = String.format(Locale.getDefault(), unformatted_message, lesson.getString("number"), lesson.getString("name"));
             AlarmNotification.sendNotification(context, message, true);
         } catch (JSONException | ParseException e) {
