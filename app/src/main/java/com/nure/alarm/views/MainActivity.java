@@ -1,5 +1,6 @@
 package com.nure.alarm.views;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -43,6 +44,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -178,6 +180,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if (getIntent().getAction() != null && getIntent().getAction().equals("change")) {
+            collapsePanel(getApplicationContext());
+
             TextView lessonTextView = findViewById(R.id.lesson);
             lessonTextView.setOnClickListener(v -> {
                 Dialog dialog = new Dialog(MainActivity.this);
@@ -231,7 +235,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (getIntent().getAction() != null && getIntent().getAction().equals("dismiss")) {
+            collapsePanel(getApplicationContext());
             Alarm.disableAlarmWork(getApplicationContext(), information);
+        }
+    }
+
+    @SuppressLint("WrongConstant")
+    private void collapsePanel(Context context) {
+        try {
+            String className = "android.app.StatusBarManager";
+            String method = "collapsePanels";
+            String service = "statusbar";
+            Class.forName(className).getMethod(method).invoke(context.getSystemService(service));
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
         }
     }
 
