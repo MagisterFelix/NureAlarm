@@ -23,6 +23,7 @@
     <string name="no_lessons">Немає занять!</string>
     <string name="lesson_number">Заняття #</string>
     <string-array name="delay">
+        <item>Без затримки</item>
         <item>10 хвилин</item>
         <item>30 хвилин</item>
         <item>1 година</item>

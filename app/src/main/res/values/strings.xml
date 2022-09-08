@@ -23,6 +23,7 @@
     <string name="no_lessons">No lessons!</string>
     <string name="lesson_number">Lesson #</string>
     <string-array name="delay">
+        <item>No delay</item>
         <item>10 minutes</item>
         <item>30 minutes</item>
         <item>1 hour</item>
