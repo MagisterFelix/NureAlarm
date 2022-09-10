@@ -12,8 +12,8 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
 import com.nure.alarm.R;
 import com.nure.alarm.core.Alarm;
-import com.nure.alarm.core.FileManager;
-import com.nure.alarm.core.SessionManager;
+import com.nure.alarm.core.managers.FileManager;
+import com.nure.alarm.core.managers.SessionManager;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.notification.AlarmNotification;
 import com.nure.alarm.views.dialogs.FailedGroupsRequestDialog;
@@ -38,9 +38,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class Request {
+
     private final Context context;
     private final ApiClient apiClient;
     private final SessionManager sessionManager;
+
+    private final static boolean NO_LESSONS = false;
 
     public Request(Context context) {
         Configuration configuration = new Configuration(context.getResources().getConfiguration());
@@ -104,11 +107,10 @@ public class Request {
 
                     Information information = FileManager.readInfo(context);
                     information.setLessons(lessons);
-                    information.setSet(lessons.length() != 0);
                     FileManager.writeInfo(context, information);
 
                     if (lessons.length() == 0) {
-                        AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), false);
+                        AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), NO_LESSONS);
                     } else {
                         Alarm.startAlarm(context, lessons.getJSONObject(0), information.getDelay());
                     }
@@ -123,7 +125,7 @@ public class Request {
                 information.setLessons(new JSONArray().put(context.getString(R.string.failed_timetable_request_message)));
                 FileManager.writeInfo(context, information);
 
-                AlarmNotification.sendNotification(context, context.getString(R.string.failed_timetable_request_message), false);
+                AlarmNotification.sendNotification(context, context.getString(R.string.failed_timetable_request_message), NO_LESSONS);
             }
         });
     }

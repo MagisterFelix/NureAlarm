@@ -6,9 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.nure.alarm.core.Alarm;
-import com.nure.alarm.core.FileManager;
 import com.nure.alarm.core.api.Request;
+import com.nure.alarm.core.managers.FileManager;
 
 import org.json.JSONException;
 
@@ -18,14 +17,17 @@ import java.util.Locale;
 
 public class AlarmWorker extends Worker {
 
+    private static final int SEVEN_HOURS = 7;
+    private static final int ONE_DAY = 1;
+
     public AlarmWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
 
     private String getDate() {
         Calendar date = Calendar.getInstance();
-        if (date.get(Calendar.HOUR_OF_DAY) > 7) {
-            date.add(Calendar.DATE, 1);
+        if (date.get(Calendar.HOUR_OF_DAY) > SEVEN_HOURS) {
+            date.add(Calendar.DATE, ONE_DAY);
         }
         return new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date.getTime());
     }
@@ -44,7 +46,6 @@ public class AlarmWorker extends Worker {
     @Override
     public Result doWork() {
         makeRequest();
-        Alarm.enableAlarmWork(getApplicationContext(), FileManager.readInfo(getApplicationContext()));
         return Result.success();
     }
 }

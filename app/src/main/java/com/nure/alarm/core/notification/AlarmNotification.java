@@ -17,7 +17,7 @@ public class AlarmNotification {
 
     public static final int NOTIFICATION_ID = 1;
     private static final String NOTIFICATION_CHANNEL = "alarm_channel";
-    private static final String NOTIFICATION_NAME = "Alarm Notification";
+    private static final String NOTIFICATION_NAME = "Alarm notification";
 
     public static void sendNotification(Context context, String message, boolean haveLessons) {
         NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL, NOTIFICATION_NAME, NotificationManager.IMPORTANCE_DEFAULT);
@@ -29,10 +29,11 @@ public class AlarmNotification {
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
+                .setGroup(NOTIFICATION_NAME)
                 .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(context.getString(R.string.alarm_clock))
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setContentIntent(resultPendingIntent)
-                .setContentTitle(context.getString(R.string.alarm))
                 .setAutoCancel(true);
 
         if (haveLessons) {
@@ -41,10 +42,10 @@ public class AlarmNotification {
                     PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
             builder.addAction(R.drawable.ic_lesson, context.getString(R.string.change_lesson), changePendingIntent);
 
-            PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 0,
-                    new Intent(context, AlarmNotificationReceiver.class).setAction("dismiss"),
+            PendingIntent removePendingIntent = PendingIntent.getBroadcast(context, 0,
+                    new Intent(context, AlarmNotificationReceiver.class).setAction("remove"),
                     PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-            builder.addAction(R.drawable.ic_dismiss, context.getString(R.string.dismiss), dismissPendingIntent);
+            builder.addAction(R.drawable.ic_remove, context.getString(R.string.remove), removePendingIntent);
         }
         Notification notification = builder.build();
 

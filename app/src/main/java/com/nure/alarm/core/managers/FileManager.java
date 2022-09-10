@@ -1,4 +1,4 @@
-package com.nure.alarm.core;
+package com.nure.alarm.core.managers;
 
 import android.content.Context;
 
@@ -18,16 +18,17 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 
 public class FileManager {
+
     private static final String INFO_FILE = "info.json";
     private static final String GROUPS_FILE = "groups.json";
 
-    private static final boolean STATUS_OFF = false;
-    private static final boolean IS_NOT_SET = false;
+    private static final boolean DISABLED = false;
     private static final int UNDEFINED_SETTING_HOUR = -1;
     private static final int UNDEFINED_SETTING_MINUTE = -1;
+    private static final int DEFAULT_DELAY = 30;
     private static final JSONObject UNDEFINED_GROUP = new JSONObject();
     private static final JSONArray UNDEFINED_LESSONS = new JSONArray();
-    private static final int DEFAULT_DELAY = 30;
+    private static final JSONObject UNDEFINED_ALARM = new JSONObject();
 
     private static void createIfNotExist(Context context, String file) {
         try {
@@ -77,31 +78,33 @@ public class FileManager {
             JSONObject object =  new JSONObject(readJSON(context, INFO_FILE));
 
             return new Information(
-                    object.getBoolean("status"),
-                    object.getBoolean("isSet"),
+                    object.getBoolean("enabled"),
                     object.getInt("settingHour"),
                     object.getInt("settingMinute"),
+                    object.getInt("delay"),
                     object.getJSONObject("group"),
                     object.getJSONArray("lessons"),
-                    object.getInt("delay")
+                    object.getJSONObject("alarm")
             );
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        return new Information(STATUS_OFF, IS_NOT_SET, UNDEFINED_SETTING_HOUR, UNDEFINED_SETTING_MINUTE, UNDEFINED_GROUP, UNDEFINED_LESSONS, DEFAULT_DELAY);
+        return new Information(DISABLED, UNDEFINED_SETTING_HOUR, UNDEFINED_SETTING_MINUTE, DEFAULT_DELAY, UNDEFINED_GROUP, UNDEFINED_LESSONS, UNDEFINED_ALARM);
     }
 
     public static void writeInfo(Context context, Information information) {
         try {
             JSONObject object = new JSONObject();
-            object.put("status", information.getStatus());
-            object.put("isSet", information.isSet());
+
+            object.put("enabled", information.isEnabled());
             object.put("settingHour", information.getSettingHour());
             object.put("settingMinute", information.getSettingMinute());
             object.put("group", information.getGroup());
             object.put("lessons", information.getLessons());
             object.put("delay", information.getDelay());
+            object.put("alarm", information.getAlarm());
+
             writeJSON(context, object, INFO_FILE);
         } catch (JSONException e) {
             e.printStackTrace();

@@ -4,35 +4,32 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Information {
-    private boolean status;
-    private boolean isSet;
+
+    private boolean enabled;
     private int settingHour;
     private int settingMinute;
+    private int delay;
     private JSONObject group;
     private JSONArray lessons;
-    private int delay;
+    private JSONObject alarm;
 
-    public Information(boolean status, boolean isSet, int settingHour, int settingMinute, JSONObject group, JSONArray lessons, int delay) {
-        this.status = status;
-        this.isSet = isSet;
+    public Information(boolean enabled, int settingHour, int settingMinute, int delay, JSONObject group, JSONArray lessons, JSONObject alarm) {
+        this.enabled = enabled;
         this.settingHour = settingHour;
         this.settingMinute = settingMinute;
+        this.delay = delay;
         this.group = group;
         this.lessons = lessons;
-        this.delay = delay;
+        this.alarm = alarm;
     }
 
-    public boolean getStatus() {
-        return status;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
-
-    public boolean isSet() { return isSet; }
-
-    public void setSet(boolean set) { this.isSet = set; }
 
     public int getSettingHour() {
         return settingHour;
@@ -48,6 +45,14 @@ public class Information {
 
     public void setSettingMinute(int settingMinute) {
         this.settingMinute = settingMinute;
+    }
+
+    public int getDelay() {
+        return delay;
+    }
+
+    public void setDelay(int delay) {
+        this.delay = delay;
     }
 
     public JSONObject getGroup() {
@@ -66,11 +71,11 @@ public class Information {
         this.lessons = lessons;
     }
 
-    public int getDelay() {
-        return delay;
+    public JSONObject getAlarm() {
+        return alarm;
     }
 
-    public void setDelay(int delay) {
-        this.delay = delay;
+    public void setAlarm(JSONObject alarm) {
+        this.alarm = alarm;
     }
 }

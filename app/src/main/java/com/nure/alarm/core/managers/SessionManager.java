@@ -1,4 +1,4 @@
-package com.nure.alarm.core;
+package com.nure.alarm.core.managers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,6 +8,7 @@ import com.nure.alarm.R;
 import java.util.Calendar;
 
 public class SessionManager {
+
     private final SharedPreferences sharedPreferences;
 
     private static final String KEY_TIME = "time";

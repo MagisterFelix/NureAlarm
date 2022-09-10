@@ -2,12 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nure.alarm">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -16,6 +18,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NureAlarm">
+
+        <activity
+            android:name=".views.AlarmActivity"
+            android:exported="false"
+            android:showOnLockScreen="true"
+            android:theme="@style/NoActionBar" />
+        <activity
+            android:name=".views.AlarmClockActivity"
+            android:exported="false" />
         <activity
             android:name=".views.MainActivity"
             android:exported="true">
@@ -25,7 +36,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".core.work.AlarmWorkManagerReceiver"
+
+        <receiver
+            android:name=".core.work.AlarmWorkManagerReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -33,6 +46,9 @@
             </intent-filter>
         </receiver>
         <receiver android:name=".core.notification.AlarmNotificationReceiver" />
+        <receiver android:name=".core.AlarmReceiver" />
+
+        <service android:name=".core.AlarmService" />
     </application>
 
 </manifest>

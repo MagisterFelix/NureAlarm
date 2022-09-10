@@ -11,13 +11,14 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 import com.nure.alarm.R;
 
 public class UnavailableNetworkDialog extends AppCompatDialogFragment {
+
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Unavailable network")
+        builder.setTitle(R.string.unavailable_network_dialog)
                 .setMessage(R.string.unavailable_network_message)
-                .setPositiveButton("ok", null);
+                .setPositiveButton(R.string.ok, null);
         return builder.create();
     }
 }

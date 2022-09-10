@@ -1,48 +1,64 @@
 package com.nure.alarm.core;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.provider.AlarmClock;
-import android.widget.Toast;
 
 import com.nure.alarm.R;
+import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.notification.AlarmNotification;
 import com.nure.alarm.core.work.AlarmWorkManager;
+import com.nure.alarm.views.AlarmClockActivity;
+import com.nure.alarm.views.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Objects;
 
 public class Alarm {
-    private final static int ZERO_SECONDS = 0;
-    private final static int ONE_DAY = 1;
-    private final static boolean SKIP_UI = true;
 
-    public static void setAlarm(Context context, int hour, int minute) {
-        Intent alarmIntent = new Intent(AlarmClock.ACTION_SET_ALARM);
-        alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        alarmIntent.putExtra(AlarmClock.EXTRA_MESSAGE, "NureAlarm");
-        alarmIntent.putExtra(AlarmClock.EXTRA_HOUR, hour);
-        alarmIntent.putExtra(AlarmClock.EXTRA_MINUTES, minute);
-        alarmIntent.putExtra(AlarmClock.EXTRA_SKIP_UI, SKIP_UI);
-        context.startActivity(alarmIntent);
+    private final static int ONE_DAY = 1;
+    private final static int ZERO_SECONDS = 0;
+    private final static int MILLISECONDS_IN_MINUTE = 60000;
+    private final static boolean HAVE_LESSONS = true;
+
+    public static void setAlarm(Context context, long time) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        PendingIntent mainActivity = PendingIntent.getActivity(context, 0,
+                new Intent(context, MainActivity.class),
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent alarmReceiver = PendingIntent.getBroadcast(context, 0,
+                new Intent(context, AlarmReceiver.class),
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+
+        alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(time, mainActivity), alarmReceiver);
+        AlarmClockActivity.updateActivity(context);
     }
 
     public static void cancelAlarm(Context context) {
-        Configuration configuration = new Configuration(context.getResources().getConfiguration());
-        configuration.setLocale(new Locale(new SessionManager(context).fetchLocale()));
-        Toast.makeText(context, context.createConfigurationContext(configuration).getString(R.string.remove_alarm_message), Toast.LENGTH_LONG).show();
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        Intent alarmIntent = new Intent(AlarmClock.ACTION_DISMISS_ALARM);
-        alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(alarmIntent);
+        PendingIntent alarmReceiver = PendingIntent.getBroadcast(context, 0,
+                new Intent(context, AlarmReceiver.class),
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.cancel(alarmReceiver);
+
+        Information information = FileManager.readInfo(context);
+        information.setAlarm(new JSONObject());
+        FileManager.writeInfo(context, information);
+    }
+
+    public static void disableAlarm(Context context) {
+        Intent alarmService = new Intent(context, AlarmService.class);
+        context.stopService(alarmService);
+        cancelAlarm(context);
     }
 
     public static void enableAlarmWork(Context context, Information information) {
@@ -61,28 +77,36 @@ public class Alarm {
         AlarmWorkManager.startWork(context, delay);
     }
 
-    public static void disableAlarmWork(Context context, Information information) {
+    public static void disableAlarmWork(Context context) {
         AlarmWorkManager.cancelWork(context);
-        if (information.isSet()) {
-            information.setSet(false);
-            FileManager.writeInfo(context, information);
-            cancelAlarm(context);
-        }
+        cancelAlarm(context);
     }
 
     public static void startAlarm(Context context, JSONObject lesson, int delay) {
         try {
-            String string_time = lesson.getString("time").split(" ")[0];
-            Calendar time = Calendar.getInstance();
-            time.setTime(Objects.requireNonNull(new SimpleDateFormat("HH:mm", Locale.getDefault()).parse(string_time)));
-            time.add(Calendar.MILLISECOND, -(delay * 60000));
+            int[] time = Arrays.stream(lesson.getString("time").split("[: ]+")).mapToInt(Integer::parseInt).toArray();
 
-            Alarm.setAlarm(context, time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE));
+            Calendar date = Calendar.getInstance();
+            date.set(Calendar.HOUR_OF_DAY, time[0]);
+            date.set(Calendar.MINUTE, time[1]);
+            date.set(Calendar.SECOND, ZERO_SECONDS);
+            date.add(Calendar.MILLISECOND, -(delay * MILLISECONDS_IN_MINUTE));
 
             String unformatted_message = context.getString(R.string.lessons_message);
             String message = String.format(Locale.getDefault(), unformatted_message, lesson.getString("number"), lesson.getString("name"));
-            AlarmNotification.sendNotification(context, message, true);
-        } catch (JSONException | ParseException e) {
+
+            Information information = FileManager.readInfo(context);
+
+            JSONObject alarm = new JSONObject();
+            alarm.put("time", new SimpleDateFormat("HH:mm", Locale.getDefault()).format(date.getTime()));
+            alarm.put("lesson", lesson.getString("name"));
+
+            information.setAlarm(alarm);
+            FileManager.writeInfo(context, information);
+
+            Alarm.setAlarm(context, date.getTimeInMillis());
+            AlarmNotification.sendNotification(context, message, HAVE_LESSONS);
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
