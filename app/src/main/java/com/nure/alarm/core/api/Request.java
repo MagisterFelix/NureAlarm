@@ -76,8 +76,12 @@ public class Request {
 
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull Throwable throwable) {
-                    FailedGroupsRequestDialog failedGroupsRequestDialog = new FailedGroupsRequestDialog();
-                    failedGroupsRequestDialog.show(fragmentManager, "FailedGroupsRequestDialog");
+                    try {
+                        FailedGroupsRequestDialog failedGroupsRequestDialog = new FailedGroupsRequestDialog();
+                        failedGroupsRequestDialog.show(fragmentManager, "FailedGroupsRequestDialog");
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         }

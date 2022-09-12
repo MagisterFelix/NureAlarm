@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -24,6 +25,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Lifecycle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -62,9 +64,6 @@ public class MainActivity extends AppCompatActivity {
 
         information = FileManager.readInfo(getApplicationContext());
         sessionManager = new SessionManager(getApplicationContext());
-
-        Request request = new Request(getApplicationContext());
-        request.getGroups(getSupportFragmentManager());
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setSelectedItemId(R.id.settings);
@@ -116,60 +115,87 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         groupTextView.setOnClickListener(v -> {
-            HashMap<String, Integer> groups = FileManager.readGroups(getApplicationContext());
+            if (NetworkStatus.isAvailable(getApplication())) {
+                HashMap<String, Integer> groups = FileManager.readGroups(getApplicationContext());
 
-            if (groups.size() > 0) {
-                Dialog dialog = new Dialog(MainActivity.this);
-                dialog.setContentView(R.layout.group_spinner);
+                if (groups.size() > 0) {
+                    Dialog dialog = new Dialog(MainActivity.this);
+                    dialog.setContentView(R.layout.group_spinner);
 
-                int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.9);
-                int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.8);
+                    int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.9);
+                    int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.8);
 
-                dialog.getWindow().setLayout(width, height);
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialog.show();
+                    dialog.getWindow().setLayout(width, height);
+                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    dialog.show();
 
-                EditText editText = dialog.findViewById(R.id.edit_text);
-                ListView listView = dialog.findViewById(R.id.group_list_view);
+                    EditText editText = dialog.findViewById(R.id.edit_text);
+                    ListView listView = dialog.findViewById(R.id.group_list_view);
 
-                ArrayList<String> sorted_groups = (ArrayList<String>) new ArrayList<>(groups.keySet()).stream().sorted().collect(Collectors.toList());
-                ArrayAdapter<String> groupAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, sorted_groups);
+                    ArrayList<String> sorted_groups = (ArrayList<String>) new ArrayList<>(groups.keySet()).stream().sorted().collect(Collectors.toList());
+                    ArrayAdapter<String> groupAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, sorted_groups);
 
-                listView.setAdapter(groupAdapter);
-                editText.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence string, int start, int count, int after) {}
+                    listView.setAdapter(groupAdapter);
+                    editText.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence string, int start, int count, int after) {}
 
-                    @Override
-                    public void onTextChanged(CharSequence string, int start, int before, int count) {
-                        groupAdapter.getFilter().filter(string);
-                    }
+                        @Override
+                        public void onTextChanged(CharSequence string, int start, int before, int count) {
+                            groupAdapter.getFilter().filter(string);
+                        }
 
-                    @Override
-                    public void afterTextChanged(Editable string) {}
-                });
+                        @Override
+                        public void afterTextChanged(Editable string) {}
+                    });
 
-                listView.setOnItemClickListener((parent, view, position, id) -> {
-                    groupTextView.setText(groupAdapter.getItem(position));
-                    JSONObject object = new JSONObject();
-                    try {
-                        object.put("id", groups.get(groupAdapter.getItem(position)));
-                        object.put("name", groupAdapter.getItem(position));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    information.setGroup(object);
-                    FileManager.writeInfo(getApplicationContext(), information);
-                    dialog.dismiss();
-                });
-            } else {
-                if (NetworkStatus.isAvailable(getApplication())) {
+                    listView.setOnItemClickListener((parent, view, position, id) -> {
+                        groupTextView.setText(groupAdapter.getItem(position));
+                        JSONObject object = new JSONObject();
+                        try {
+                            object.put("id", groups.get(groupAdapter.getItem(position)));
+                            object.put("name", groupAdapter.getItem(position));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        information.setGroup(object);
+                        FileManager.writeInfo(getApplicationContext(), information);
+                        dialog.dismiss();
+                    });
+                } else {
                     ReceivingGroupsDialog receivingGroupsDialog = new ReceivingGroupsDialog();
+                    receivingGroupsDialog.setCancelable(false);
                     receivingGroupsDialog.show(getSupportFragmentManager(), "ReceivingGroupsDialog");
-                } else{
-                    UnavailableNetworkDialog unavailableNetworkDialog = new UnavailableNetworkDialog();
-                    unavailableNetworkDialog.show(getSupportFragmentManager(), "UnavailableNetworkDialog");
+
+                    Request request = new Request(getApplicationContext());
+                    request.getGroups(getSupportFragmentManager());
+
+                    new CountDownTimer(5000, 1000) {
+                        @Override
+                        public void onTick(long time) {
+                            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                                if (FileManager.readGroups(getApplicationContext()).size() > 0) {
+                                    cancel();
+                                    receivingGroupsDialog.dismiss();
+                                    groupTextView.performClick();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                                receivingGroupsDialog.dismiss();
+                                if (FileManager.readGroups(getApplicationContext()).size() > 0) {
+                                    groupTextView.performClick();
+                                }
+                            }
+                        }
+                    }.start();
                 }
+            } else {
+                UnavailableNetworkDialog unavailableNetworkDialog = new UnavailableNetworkDialog();
+                unavailableNetworkDialog.show(getSupportFragmentManager(), "UnavailableNetworkDialog");
             }
         });
 

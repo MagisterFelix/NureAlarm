@@ -17,13 +17,7 @@ public class ReceivingGroupsDialog extends AppCompatDialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.receiving_groups_dialog)
-                .setMessage(R.string.receiving_groups_message)
-                .setPositiveButton(R.string.ok, (dialogInterface, i) -> {
-                    requireActivity().finish();
-                    requireActivity().overridePendingTransition(0, 0);
-                    startActivity(requireActivity().getIntent());
-                    requireActivity().overridePendingTransition(0, 0);
-                });
+                .setView(R.layout.loading);
         return builder.create();
     }
 }
