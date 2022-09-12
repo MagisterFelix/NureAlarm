@@ -17,7 +17,7 @@
     <string name="receiving_groups_message">NureAlarm отримує список груп, зачекайте трохи.</string>
     <string name="unavailable_network_message">Для використання NureAlarm потрібне стабільне підключення до Інтернету. Підключіться до Wi-Fi або увімкніть мобільну мережу.</string>
     <string name="failed_groups_request_message">Не вдалося отримати список груп. Можливо, у вас погане інтернет-зʼєднання або cist.nure.ua не відповідає.</string>
-    <string name="not_specified_information_message">Для запуску програми необхідно вказати групу і час установки будильника.</string>
+    <string name="not_specified_information_message">Для запуску програми необхідно вказати групу і час встановлення будильника.</string>
     <string name="failed_timetable_request_message">Не вдалося отримати список занять. Можливо, у вас погане інтернет-з’єднання або cist.nure.ua не відповідає.</string>
     <string name="lessons_message">Встановлено на %s заняття - %s</string>
     <string name="no_lessons">Немає занять!</string>
