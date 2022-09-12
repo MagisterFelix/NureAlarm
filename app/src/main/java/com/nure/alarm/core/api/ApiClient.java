@@ -2,6 +2,8 @@ package com.nure.alarm.core.api;
 
 import org.riversun.okhttp3.OkHttp3CookieHelper;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -17,6 +19,7 @@ public class ApiClient {
             cookieHelper.setCookie(Endpoint.BASE, "cookieName", "cookieValue");
 
             OkHttpClient client = new OkHttpClient.Builder()
+                    .connectTimeout(5, TimeUnit.SECONDS)
                     .cookieJar(cookieHelper.cookieJar())
                     .build();
 
