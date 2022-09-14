@@ -7,6 +7,7 @@ import android.content.Intent;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.nure.alarm.core.Alarm;
+import com.nure.alarm.core.work.AlarmWorkerReceiver;
 import com.nure.alarm.views.AlarmClockActivity;
 import com.nure.alarm.views.MainActivity;
 
@@ -15,6 +16,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
     private final static String ACTION_DISMISS = "dismiss";
     private final static String ACTION_CHANGE = "change";
     private final static String ACTION_REMOVE = "remove";
+    private final static String ACTION_RETRY = "retry";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -35,6 +37,11 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
 
             if (action.equals(ACTION_REMOVE)) {
                 Alarm.cancelAlarm(context);
+                AlarmClockActivity.updateActivity(context);
+            }
+
+            if (action.equals(ACTION_RETRY)) {
+                AlarmWorkerReceiver.startWork(context);
                 AlarmClockActivity.updateActivity(context);
             }
 

@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         sessionManager = new SessionManager(getApplicationContext());
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
-        navigation.setSelectedItemId(R.id.settings);
+        navigation.setSelectedItemId(R.id.alarm_settings);
         navigation.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.alarm_clock) {
                 Intent alarmClockActivity = new Intent(getApplicationContext(), AlarmClockActivity.class);
@@ -116,6 +116,9 @@ public class MainActivity extends AppCompatActivity {
         }
         groupTextView.setOnClickListener(v -> {
             if (NetworkStatus.isAvailable(getApplication())) {
+                Request request = new Request(getApplicationContext());
+                request.getGroups(getSupportFragmentManager());
+
                 HashMap<String, Integer> groups = FileManager.readGroups(getApplicationContext());
 
                 if (groups.size() > 0) {
@@ -167,10 +170,7 @@ public class MainActivity extends AppCompatActivity {
                     receivingGroupsDialog.setCancelable(false);
                     receivingGroupsDialog.show(getSupportFragmentManager(), "ReceivingGroupsDialog");
 
-                    Request request = new Request(getApplicationContext());
-                    request.getGroups(getSupportFragmentManager());
-
-                    new CountDownTimer(5000, 1000) {
+                    new CountDownTimer(10000, 1000) {
                         @Override
                         public void onTick(long time) {
                             if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
@@ -304,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 sessionManager.saveLocale("en");
             }
-            locale.setIcon(sessionManager.fetchLocale().equals("uk") ? R.mipmap.ic_uk : R.mipmap.ic_en);
+            menuItem.setIcon(sessionManager.fetchLocale().equals("uk") ? R.mipmap.ic_uk : R.mipmap.ic_en);
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
             finish();
             overridePendingTransition(0, 0);

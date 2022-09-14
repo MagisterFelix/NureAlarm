@@ -42,6 +42,7 @@
             </intent-filter>
         </activity>
 
+        <receiver android:name=".core.work.AlarmWorkerReceiver" />
         <receiver
             android:name=".core.work.AlarmWorkManagerReceiver"
             android:exported="true">

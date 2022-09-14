@@ -43,4 +43,6 @@
     <string name="receiving_groups_dialog">Отримання груп</string>
     <string name="unavailable_network_dialog">Недоступна мережа</string>
     <string name="ok">ОК</string>
+    <string name="retry">Повторити спробу</string>
+    <string name="add_alarm">Додати будильник</string>
 </resources>

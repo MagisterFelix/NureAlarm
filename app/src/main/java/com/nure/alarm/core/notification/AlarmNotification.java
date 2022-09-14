@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -19,7 +20,7 @@ public class AlarmNotification {
     private static final String NOTIFICATION_CHANNEL = "alarm_channel";
     private static final String NOTIFICATION_NAME = "Alarm notification";
 
-    public static void sendNotification(Context context, String message, boolean haveLessons) {
+    public static void sendNotification(Context context, String message, @Nullable Boolean haveLessons) {
         NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL, NOTIFICATION_NAME, NotificationManager.IMPORTANCE_DEFAULT);
         NotificationManager manager = context.getSystemService(NotificationManager.class);
         manager.createNotificationChannel(channel);
@@ -36,16 +37,23 @@ public class AlarmNotification {
                 .setContentIntent(resultPendingIntent)
                 .setAutoCancel(true);
 
-        if (haveLessons) {
-            PendingIntent changePendingIntent = PendingIntent.getBroadcast(context, 0,
-                    new Intent(context, AlarmNotificationReceiver.class).setAction("change"),
-                    PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-            builder.addAction(R.drawable.ic_lesson, context.getString(R.string.change_lesson), changePendingIntent);
+        if (haveLessons != null) {
+            if (haveLessons) {
+                PendingIntent changePendingIntent = PendingIntent.getBroadcast(context, 0,
+                        new Intent(context, AlarmNotificationReceiver.class).setAction("change"),
+                        PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+                builder.addAction(R.drawable.ic_lesson, context.getString(R.string.change_lesson), changePendingIntent);
 
-            PendingIntent removePendingIntent = PendingIntent.getBroadcast(context, 0,
-                    new Intent(context, AlarmNotificationReceiver.class).setAction("remove"),
+                PendingIntent removePendingIntent = PendingIntent.getBroadcast(context, 0,
+                        new Intent(context, AlarmNotificationReceiver.class).setAction("remove"),
+                        PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+                builder.addAction(R.drawable.ic_remove, context.getString(R.string.remove), removePendingIntent);
+            }
+        } else {
+            PendingIntent retryPendingIntent = PendingIntent.getBroadcast(context, 0,
+                    new Intent(context, AlarmNotificationReceiver.class).setAction("retry"),
                     PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-            builder.addAction(R.drawable.ic_remove, context.getString(R.string.remove), removePendingIntent);
+            builder.addAction(R.drawable.ic_retry, context.getString(R.string.retry), retryPendingIntent);
         }
         Notification notification = builder.build();
 

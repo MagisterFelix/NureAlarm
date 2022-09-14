@@ -16,6 +16,7 @@ import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.notification.AlarmNotification;
+import com.nure.alarm.views.AlarmClockActivity;
 import com.nure.alarm.views.dialogs.FailedGroupsRequestDialog;
 
 import org.json.JSONArray;
@@ -42,8 +43,6 @@ public class Request {
     private final Context context;
     private final ApiClient apiClient;
     private final SessionManager sessionManager;
-
-    private final static boolean NO_LESSONS = false;
 
     public Request(Context context) {
         Configuration configuration = new Configuration(context.getResources().getConfiguration());
@@ -114,10 +113,12 @@ public class Request {
                     FileManager.writeInfo(context, information);
 
                     if (lessons.length() == 0) {
-                        AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), NO_LESSONS);
+                        AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), false);
                     } else {
                         Alarm.startAlarm(context, lessons.getJSONObject(0), information.getDelay());
                     }
+
+                    AlarmClockActivity.updateActivity(context);
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }
@@ -129,7 +130,8 @@ public class Request {
                 information.setLessons(new JSONArray().put(context.getString(R.string.failed_timetable_request_message)));
                 FileManager.writeInfo(context, information);
 
-                AlarmNotification.sendNotification(context, context.getString(R.string.failed_timetable_request_message), NO_LESSONS);
+                AlarmNotification.sendNotification(context, context.getString(R.string.failed_timetable_request_message), null);
+                AlarmClockActivity.updateActivity(context);
             }
         });
     }

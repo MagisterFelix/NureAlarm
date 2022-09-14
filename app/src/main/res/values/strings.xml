@@ -43,4 +43,6 @@
     <string name="receiving_groups_dialog">Getting groups</string>
     <string name="unavailable_network_dialog">Unavailable network</string>
     <string name="ok">OK</string>
+    <string name="retry">Retry</string>
+    <string name="add_alarm">Add an alarm</string>
 </resources>

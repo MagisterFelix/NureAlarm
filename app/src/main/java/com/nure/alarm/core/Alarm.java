@@ -23,10 +23,7 @@ import java.util.Locale;
 
 public class Alarm {
 
-    private final static int ONE_DAY = 1;
-    private final static int ZERO_SECONDS = 0;
     private final static int MILLISECONDS_IN_MINUTE = 60000;
-    private final static boolean HAVE_LESSONS = true;
 
     public static void setAlarm(Context context, long time) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -64,48 +61,56 @@ public class Alarm {
     public static void enableAlarmWork(Context context, Information information) {
         Calendar now = Calendar.getInstance();
 
-        Calendar startTime = Calendar.getInstance();
-        startTime.set(Calendar.HOUR_OF_DAY, information.getSettingHour());
-        startTime.set(Calendar.MINUTE, information.getSettingMinute());
-        startTime.set(Calendar.SECOND, ZERO_SECONDS);
+        Calendar notificationTime = Calendar.getInstance();
+        notificationTime.set(Calendar.HOUR_OF_DAY, information.getSettingHour());
+        notificationTime.set(Calendar.MINUTE, information.getSettingMinute());
+        notificationTime.set(Calendar.SECOND, 0);
 
-        if (startTime.before(now)) {
-            startTime.add(Calendar.DATE, ONE_DAY);
+        if (notificationTime.before(now)) {
+            notificationTime.add(Calendar.DATE, 1);
         }
 
-        long delay = startTime.getTimeInMillis() - now.getTimeInMillis();
-        AlarmWorkManager.startWork(context, delay);
+        AlarmWorkManager.setAlarmWork(context, notificationTime.getTimeInMillis());
     }
 
     public static void disableAlarmWork(Context context) {
-        AlarmWorkManager.cancelWork(context);
+        AlarmWorkManager.cancelAlarmWork(context);
         cancelAlarm(context);
     }
 
     public static void startAlarm(Context context, JSONObject lesson, int delay) {
         try {
+            Calendar now = Calendar.getInstance();
+
             int[] time = Arrays.stream(lesson.getString("time").split("[: ]+")).mapToInt(Integer::parseInt).toArray();
 
             Calendar date = Calendar.getInstance();
             date.set(Calendar.HOUR_OF_DAY, time[0]);
             date.set(Calendar.MINUTE, time[1]);
-            date.set(Calendar.SECOND, ZERO_SECONDS);
+            date.set(Calendar.SECOND, 0);
             date.add(Calendar.MILLISECOND, -(delay * MILLISECONDS_IN_MINUTE));
+
+            if (date.before(now)) {
+                date.add(Calendar.DATE, 1);
+            }
 
             String unformatted_message = context.getString(R.string.lessons_message);
             String message = String.format(Locale.getDefault(), unformatted_message, lesson.getString("number"), lesson.getString("name"));
+            String formatted_time = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(date.getTime());
 
             Information information = FileManager.readInfo(context);
 
-            JSONObject alarm = new JSONObject();
-            alarm.put("time", new SimpleDateFormat("HH:mm", Locale.getDefault()).format(date.getTime()));
-            alarm.put("lesson", lesson.getString("name"));
+            if (information.getAlarm().length() == 0 || !information.getAlarm().getString("time").equals(formatted_time)) {
+                JSONObject alarm = new JSONObject();
+                alarm.put("time", formatted_time);
+                alarm.put("lesson", lesson.getString("name"));
 
-            information.setAlarm(alarm);
-            FileManager.writeInfo(context, information);
+                information.setAlarm(alarm);
+                FileManager.writeInfo(context, information);
 
-            Alarm.setAlarm(context, date.getTimeInMillis());
-            AlarmNotification.sendNotification(context, message, HAVE_LESSONS);
+                Alarm.setAlarm(context, date.getTimeInMillis());
+                AlarmNotification.sendNotification(context, message, true);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

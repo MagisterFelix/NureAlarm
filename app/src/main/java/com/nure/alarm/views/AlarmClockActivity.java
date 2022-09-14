@@ -4,10 +4,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -18,7 +23,11 @@ import com.nure.alarm.R;
 import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
 import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.network.NetworkStatus;
+import com.nure.alarm.core.work.AlarmWorkerReceiver;
 import com.nure.alarm.views.dialogs.ConfirmationDialog;
+import com.nure.alarm.views.dialogs.NotSpecifiedInformationDialog;
+import com.nure.alarm.views.dialogs.UnavailableNetworkDialog;
 
 import org.json.JSONException;
 
@@ -76,7 +85,6 @@ public class AlarmClockActivity extends AppCompatActivity {
                     ConfirmationDialog confirmationDialog = new ConfirmationDialog();
                     confirmationDialog.show(getSupportFragmentManager(), "ConfirmationDialog");
                 });
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -111,6 +119,41 @@ public class AlarmClockActivity extends AppCompatActivity {
     public static void updateActivity(Context context) {
         Intent updateIntent = new Intent(UPDATE_ACTIVITY_ACTION);
         context.sendBroadcast(updateIntent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.alarm_clock_menu, menu);
+
+        Information information = FileManager.readInfo(getApplicationContext());
+
+        if (information.getAlarm().length() == 0) {
+            MenuItem addAlarm = menu.findItem(R.id.add_alarm);
+            addAlarm.setVisible(true);
+            addAlarm.setOnMenuItemClickListener(menuItem -> {
+                if (information.getSettingHour() == -1 && information.getSettingMinute() == -1 || information.getGroup().length() == 0) {
+                    NotSpecifiedInformationDialog notSpecifiedInformationDialog = new NotSpecifiedInformationDialog();
+                    notSpecifiedInformationDialog.show(getSupportFragmentManager(), "NotSpecifiedInformationDialog");
+                    return false;
+                } else {
+                    if (NetworkStatus.isAvailable(getApplication())) {
+                        AlarmWorkerReceiver.startWork(getApplicationContext());
+                        ProgressBar progressBar = new ProgressBar(getApplicationContext());
+                        progressBar.setScaleX(0.6f);
+                        progressBar.setScaleY(0.6f);
+                        progressBar.setIndeterminateTintList(ColorStateList.valueOf(Color.WHITE));
+                        menuItem.setActionView(progressBar);
+                        return true;
+                    } else {
+                        UnavailableNetworkDialog unavailableNetworkDialog = new UnavailableNetworkDialog();
+                        unavailableNetworkDialog.show(getSupportFragmentManager(), "UnavailableNetworkDialog");
+                        return false;
+                    }
+                }
+            });
+        }
+
+        return true;
     }
 
     @Override
