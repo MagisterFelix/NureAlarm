@@ -48,6 +48,8 @@ public class AlarmClockActivity extends AppCompatActivity {
     public final static String UPDATE_ACTIVITY_ACTION = "update";
 
     private Information information;
+    private SessionManager sessionManager;
+
     private BroadcastReceiver broadcastReceiver;
 
     @Override
@@ -58,15 +60,13 @@ public class AlarmClockActivity extends AppCompatActivity {
         registerReceiver();
 
         information = FileManager.readInfo(getApplicationContext());
+        sessionManager = new SessionManager(getApplicationContext());
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setSelectedItemId(R.id.alarm_clock);
         navigation.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.alarm_settings) {
-                Intent mainActivity = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(mainActivity);
-                finish();
-                overridePendingTransition(0, 0);
+                startMainActivity(true);
                 return true;
             }
             return false;
@@ -100,7 +100,27 @@ public class AlarmClockActivity extends AppCompatActivity {
 
         if (getIntent().getAction() != null && getIntent().getAction().equals("change")) {
             changeLesson();
+        } else {
+            if (getIntent().getExtras() == null && !getClass().getSimpleName().equals(sessionManager.fetchLastActivity())) {
+                startMainActivity(false);
+            }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        sessionManager.saveLastActivity(getClass().getSimpleName());
+        super.onResume();
+    }
+
+    private void startMainActivity(boolean noCheck) {
+        Intent mainActivity = new Intent(getApplicationContext(), MainActivity.class);
+        if (noCheck) {
+            mainActivity.putExtra("noCheck", true);
+        }
+        startActivity(mainActivity);
+        finish();
+        overridePendingTransition(0, 0);
     }
 
     @Override

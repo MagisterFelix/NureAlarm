@@ -62,14 +62,15 @@ public class MainActivity extends AppCompatActivity {
         information = FileManager.readInfo(getApplicationContext());
         sessionManager = new SessionManager(getApplicationContext());
 
+        if (getIntent().getExtras() == null && !getClass().getSimpleName().equals(sessionManager.fetchLastActivity())) {
+            startAlarmClockActivity(false);
+        }
+
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setSelectedItemId(R.id.alarm_settings);
         navigation.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.alarm_clock) {
-                Intent alarmClockActivity = new Intent(getApplicationContext(), AlarmClockActivity.class);
-                startActivity(alarmClockActivity);
-                finish();
-                overridePendingTransition(0, 0);
+                startAlarmClockActivity(true);
                 return true;
             }
             return false;
@@ -212,6 +213,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {}
         });
+    }
+
+    @Override
+    protected void onResume() {
+        sessionManager.saveLastActivity(getClass().getSimpleName());
+        super.onResume();
+    }
+
+    private void startAlarmClockActivity(boolean noCheck) {
+        Intent alarmClockActivity = new Intent(getApplicationContext(), AlarmClockActivity.class);
+        if (noCheck) {
+            alarmClockActivity.putExtra("noCheck", true);
+        }
+        startActivity(alarmClockActivity);
+        finish();
+        overridePendingTransition(0, 0);
     }
 
     @Override

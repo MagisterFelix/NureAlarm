@@ -26,7 +26,7 @@ public class AlarmNotification {
         manager.createNotificationChannel(channel);
 
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0,
-                new Intent(context, AlarmClockActivity.class),
+                new Intent(context, AlarmClockActivity.class).putExtra("noCheck", true),
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
