@@ -117,6 +117,12 @@
 
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/lesson"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="10dp"

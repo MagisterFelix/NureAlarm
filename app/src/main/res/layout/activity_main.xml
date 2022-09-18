@@ -99,18 +99,6 @@
 
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/lesson"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:drawable/editbox_background"
-            android:gravity="center_vertical"
-            android:hint="@string/select_lesson"
-            android:padding="12dp"
-            android:textColorHint="#757575"
-            android:visibility="gone"
-            app:drawableEndCompat="@drawable/ic_arrow" />
-
     </RelativeLayout>
 
     <View

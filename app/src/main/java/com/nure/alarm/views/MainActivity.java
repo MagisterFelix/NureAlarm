@@ -1,6 +1,5 @@
 package com.nure.alarm.views;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -35,17 +34,15 @@ import com.nure.alarm.core.api.Request;
 import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
 import com.nure.alarm.core.models.Information;
-import com.nure.alarm.core.network.NetworkStatus;
+import com.nure.alarm.core.network.NetworkInfo;
 import com.nure.alarm.views.dialogs.HelpDialog;
 import com.nure.alarm.views.dialogs.NotSpecifiedInformationDialog;
 import com.nure.alarm.views.dialogs.ReceivingGroupsDialog;
 import com.nure.alarm.views.dialogs.UnavailableNetworkDialog;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -115,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         groupTextView.setOnClickListener(v -> {
-            if (NetworkStatus.isAvailable(getApplication())) {
+            if (NetworkInfo.isNetworkAvailable(getApplication())) {
                 Request request = new Request(getApplicationContext());
                 request.getGroups(getSupportFragmentManager());
 
@@ -215,65 +212,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {}
         });
-
-        if (getIntent().getAction() != null && getIntent().getAction().equals("change")) {
-            collapsePanel(getApplicationContext());
-
-            TextView lessonTextView = findViewById(R.id.lesson);
-            lessonTextView.setOnClickListener(v -> {
-                Dialog dialog = new Dialog(MainActivity.this);
-                dialog.setContentView(R.layout.lesson_spinner);
-
-                int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.9);
-                int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.8);
-
-                dialog.getWindow().setLayout(width, height);
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialog.show();
-
-                Configuration configuration = new Configuration(getApplicationContext().getResources().getConfiguration());
-                configuration.setLocale(new Locale(new SessionManager(getApplicationContext()).fetchLocale()));
-                Context context = getApplicationContext().createConfigurationContext(configuration);
-
-                ListView listView = dialog.findViewById(R.id.lesson_list_view);
-
-                JSONArray lessons = FileManager.readInfo(getApplicationContext()).getLessons();
-                ArrayList<String> formatted_lessons = new ArrayList<>();
-                for (int i = 0; i < lessons.length(); ++i) {
-                    try {
-                        JSONObject jsonObject = lessons.getJSONObject(i);
-                        formatted_lessons.add(context.getString(R.string.lesson_number) + jsonObject.getString("number") + " - " + jsonObject.getString("name"));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                ArrayAdapter<String> groupAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, formatted_lessons);
-
-                listView.setAdapter(groupAdapter);
-                listView.setOnItemClickListener((parent, view, position, id) -> {
-                    Alarm.cancelAlarm(getApplicationContext());
-                    try {
-                        Alarm.startAlarm(context, lessons.getJSONObject(position), information.getDelay());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    dialog.dismiss();
-                });
-            });
-            lessonTextView.performClick();
-        }
-    }
-
-    @SuppressLint("WrongConstant")
-    private void collapsePanel(Context context) {
-        try {
-            String className = "android.app.StatusBarManager";
-            String method = "collapsePanels";
-            String service = "statusbar";
-            Class.forName(className).getMethod(method).invoke(context.getSystemService(service));
-        } catch (ClassNotFoundException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -321,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
                 NotSpecifiedInformationDialog notSpecifiedInformationDialog = new NotSpecifiedInformationDialog();
                 notSpecifiedInformationDialog.show(getSupportFragmentManager(), "NotSpecifiedInformationDialog");
             } else {
-                if (NetworkStatus.isAvailable(getApplication())) {
+                if (NetworkInfo.isNetworkAvailable(getApplication())) {
                     information.setEnabled(isChecked);
                     FileManager.writeInfo(getApplicationContext(), information);
 

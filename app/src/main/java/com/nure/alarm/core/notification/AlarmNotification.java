@@ -12,7 +12,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.nure.alarm.R;
-import com.nure.alarm.views.MainActivity;
+import com.nure.alarm.views.AlarmClockActivity;
 
 public class AlarmNotification {
 
@@ -26,7 +26,7 @@ public class AlarmNotification {
         manager.createNotificationChannel(channel);
 
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0,
-                new Intent(context, MainActivity.class),
+                new Intent(context, AlarmClockActivity.class),
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)

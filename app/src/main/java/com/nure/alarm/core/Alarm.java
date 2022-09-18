@@ -52,12 +52,6 @@ public class Alarm {
         FileManager.writeInfo(context, information);
     }
 
-    public static void disableAlarm(Context context) {
-        Intent alarmService = new Intent(context, AlarmService.class);
-        context.stopService(alarmService);
-        cancelAlarm(context);
-    }
-
     public static void enableAlarmWork(Context context, Information information) {
         Calendar now = Calendar.getInstance();
 
@@ -114,5 +108,11 @@ public class Alarm {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void stopAlarm(Context context) {
+        Intent alarmService = new Intent(context, AlarmService.class);
+        context.stopService(alarmService);
+        cancelAlarm(context);
     }
 }

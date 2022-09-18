@@ -29,6 +29,7 @@
             android:name=".views.AlarmClockActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:noHistory="true"
             tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".views.MainActivity"

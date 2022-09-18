@@ -114,11 +114,10 @@ public class Request {
 
                     if (lessons.length() == 0) {
                         AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), false);
+                        AlarmClockActivity.updateActivity(context);
                     } else {
                         Alarm.startAlarm(context, lessons.getJSONObject(0), information.getDelay());
                     }
-
-                    AlarmClockActivity.updateActivity(context);
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }

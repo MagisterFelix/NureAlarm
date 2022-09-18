@@ -32,7 +32,7 @@ public class AlarmActivity extends AppCompatActivity {
 
         ImageView alarmClock = findViewById(R.id.alarm_clock);
         alarmClock.setOnClickListener(view -> {
-            Alarm.disableAlarm(getApplicationContext());
+            Alarm.stopAlarm(getApplicationContext());
             AlarmClockActivity.updateActivity(getApplicationContext());
             finish();
         });
