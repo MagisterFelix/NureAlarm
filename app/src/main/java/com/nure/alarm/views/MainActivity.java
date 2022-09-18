@@ -77,9 +77,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Button settingTimeButton = findViewById(R.id.setting_time_button);
-        if (information.getSettingHour() != -1 && information.getSettingMinute() != -1) {
-            settingTimeButton.setText(String.format(Locale.getDefault(), "%02d:%02d", information.getSettingHour(), information.getSettingMinute()));
-        }
+        settingTimeButton.setText(String.format(Locale.getDefault(), "%02d:%02d", information.getSettingHour(), information.getSettingMinute()));
         settingTimeButton.setOnClickListener(view -> {
             TimePickerDialog.OnTimeSetListener onTimeSetListener = (timePicker, selectedHour, selectedMinute) -> {
                 information.setSettingHour(selectedHour);

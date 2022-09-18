@@ -23,8 +23,8 @@ public class FileManager {
     private static final String GROUPS_FILE = "groups.json";
 
     private static final boolean DISABLED = false;
-    private static final int UNDEFINED_SETTING_HOUR = -1;
-    private static final int UNDEFINED_SETTING_MINUTE = -1;
+    private static final int DEFAULT_SETTING_HOUR = 20;
+    private static final int DEFAULT_SETTING_MINUTE = 0;
     private static final int DEFAULT_DELAY = 30;
     private static final JSONObject UNDEFINED_GROUP = new JSONObject();
     private static final JSONArray UNDEFINED_LESSONS = new JSONArray();
@@ -90,7 +90,7 @@ public class FileManager {
             e.printStackTrace();
         }
 
-        return new Information(DISABLED, UNDEFINED_SETTING_HOUR, UNDEFINED_SETTING_MINUTE, DEFAULT_DELAY, UNDEFINED_GROUP, UNDEFINED_LESSONS, UNDEFINED_ALARM);
+        return new Information(DISABLED, DEFAULT_SETTING_HOUR, DEFAULT_SETTING_MINUTE, DEFAULT_DELAY, UNDEFINED_GROUP, UNDEFINED_LESSONS, UNDEFINED_ALARM);
     }
 
     public static void writeInfo(Context context, Information information) {
