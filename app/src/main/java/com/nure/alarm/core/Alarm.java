@@ -23,7 +23,7 @@ import java.util.Locale;
 
 public class Alarm {
 
-    private final static int MILLISECONDS_IN_MINUTE = 60000;
+    private static final int MILLISECONDS_IN_MINUTE = 60000;
 
     public static void setAlarm(Context context, long time) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

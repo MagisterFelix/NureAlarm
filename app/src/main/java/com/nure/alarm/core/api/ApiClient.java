@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ApiClient {
 
     private ApiService apiService;
-    private final static Class<ApiService> API_SERVICE_CLASS = ApiService.class;
+    private static final Class<ApiService> API_SERVICE_CLASS = ApiService.class;
 
     public ApiService getApiService() {
         if (apiService == null) {

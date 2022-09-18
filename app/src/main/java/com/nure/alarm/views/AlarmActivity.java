@@ -15,7 +15,7 @@ import com.nure.alarm.core.Alarm;
 
 public class AlarmActivity extends AppCompatActivity {
 
-    private final static String ROTATION_ANIMATION = "rotation";
+    private static final String ROTATION_ANIMATION = "rotation";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

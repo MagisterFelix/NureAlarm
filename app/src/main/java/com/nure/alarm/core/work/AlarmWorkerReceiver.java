@@ -12,12 +12,12 @@ import androidx.work.WorkManager;
 
 public class AlarmWorkerReceiver extends BroadcastReceiver {
 
-    private final static String ACTION_START = "start";
-    private final static String ACTION_CANCEL = "cancel";
+    private static final String ACTION_START = "start";
+    private static final String ACTION_CANCEL = "cancel";
 
-    private final static Class<AlarmWorker> ALARM_WORKER_CLASS = AlarmWorker.class;
-    private final static Constraints NETWORK_CONNECTED = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
-    private final static String ALARM_WORK_TAG = "AlarmWork";
+    private static final Class<AlarmWorker> ALARM_WORKER_CLASS = AlarmWorker.class;
+    private static final Constraints NETWORK_CONNECTED = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
+    private static final String ALARM_WORK_TAG = "AlarmWork";
 
     public static void startWork(Context context) {
         OneTimeWorkRequest request = new OneTimeWorkRequest

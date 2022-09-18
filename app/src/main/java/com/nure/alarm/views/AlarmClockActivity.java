@@ -45,7 +45,7 @@ import java.util.Locale;
 
 public class AlarmClockActivity extends AppCompatActivity {
 
-    public final static String UPDATE_ACTIVITY_ACTION = "update";
+    public static final String UPDATE_ACTIVITY_ACTION = "update";
 
     private Information information;
     private SessionManager sessionManager;

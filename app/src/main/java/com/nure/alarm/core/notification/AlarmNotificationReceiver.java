@@ -12,10 +12,10 @@ import com.nure.alarm.views.AlarmClockActivity;
 
 public class AlarmNotificationReceiver extends BroadcastReceiver {
 
-    private final static String ACTION_DISMISS = "dismiss";
-    private final static String ACTION_CHANGE = "change";
-    private final static String ACTION_REMOVE = "remove";
-    private final static String ACTION_RETRY = "retry";
+    private static final String ACTION_DISMISS = "dismiss";
+    private static final String ACTION_CHANGE = "change";
+    private static final String ACTION_REMOVE = "remove";
+    private static final String ACTION_RETRY = "retry";
 
     @Override
     public void onReceive(Context context, Intent intent) {
