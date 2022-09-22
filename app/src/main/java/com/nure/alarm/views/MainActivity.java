@@ -31,6 +31,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.nure.alarm.R;
 import com.nure.alarm.core.Alarm;
 import com.nure.alarm.core.api.Request;
+import com.nure.alarm.core.managers.ContextManager;
 import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
 import com.nure.alarm.core.models.Information;
@@ -231,11 +232,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context base) {
-        Locale locale = new Locale(new SessionManager(base).fetchLocale());
-        Locale.setDefault(locale);
-        Configuration configuration = base.getResources().getConfiguration();
-        configuration.setLocale(locale);
-        super.attachBaseContext(base.createConfigurationContext(configuration));
+        super.attachBaseContext(ContextManager.getLocaleContext(base));
     }
 
     @Override

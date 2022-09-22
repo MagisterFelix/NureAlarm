@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
@@ -20,8 +19,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.nure.alarm.R;
+import com.nure.alarm.core.managers.ContextManager;
 import com.nure.alarm.core.managers.FileManager;
-import com.nure.alarm.core.managers.SessionManager;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.notification.AlarmNotificationReceiver;
 import com.nure.alarm.views.AlarmActivity;
@@ -31,7 +30,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Locale;
 
 public class AlarmService extends Service {
 
@@ -68,9 +66,7 @@ public class AlarmService extends Service {
     }
 
     private void setUpNotification() {
-        Configuration configuration = new Configuration(getApplicationContext().getResources().getConfiguration());
-        configuration.setLocale(new Locale(new SessionManager(getApplicationContext()).fetchLocale()));
-        Context context = getApplicationContext().createConfigurationContext(configuration);
+        Context context = ContextManager.getLocaleContext(getApplicationContext());
 
         try {
             JSONObject alarm = information.getAlarm();

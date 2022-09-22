@@ -1,7 +1,6 @@
 package com.nure.alarm.core.api;
 
 import android.content.Context;
-import android.content.res.Configuration;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
@@ -12,6 +11,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
 import com.nure.alarm.R;
 import com.nure.alarm.core.Alarm;
+import com.nure.alarm.core.managers.ContextManager;
 import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
 import com.nure.alarm.core.models.Information;
@@ -45,10 +45,7 @@ public class Request {
     private final SessionManager sessionManager;
 
     public Request(Context context) {
-        Configuration configuration = new Configuration(context.getResources().getConfiguration());
-        configuration.setLocale(new Locale(new SessionManager(context).fetchLocale()));
-
-        this.context = context.createConfigurationContext(configuration);
+        this.context = ContextManager.getLocaleContext(context);
         this.apiClient = new ApiClient();
         this.sessionManager = new SessionManager(context);
     }

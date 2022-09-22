@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.ColorStateList;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -26,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.nure.alarm.R;
 import com.nure.alarm.core.Alarm;
+import com.nure.alarm.core.managers.ContextManager;
 import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
 import com.nure.alarm.core.models.Information;
@@ -41,7 +41,6 @@ import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class AlarmClockActivity extends AppCompatActivity {
 
@@ -125,11 +124,7 @@ public class AlarmClockActivity extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context base) {
-        Locale locale = new Locale(new SessionManager(base).fetchLocale());
-        Locale.setDefault(locale);
-        Configuration configuration = base.getResources().getConfiguration();
-        configuration.setLocale(locale);
-        super.attachBaseContext(base.createConfigurationContext(configuration));
+        super.attachBaseContext(ContextManager.getLocaleContext(base));
     }
 
     @SuppressLint("WrongConstant")
@@ -159,9 +154,7 @@ public class AlarmClockActivity extends AppCompatActivity {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialog.show();
 
-            Configuration configuration = new Configuration(getApplicationContext().getResources().getConfiguration());
-            configuration.setLocale(new Locale(new SessionManager(getApplicationContext()).fetchLocale()));
-            Context context = getApplicationContext().createConfigurationContext(configuration);
+            Context context = ContextManager.getLocaleContext(getApplicationContext());
 
             ListView listView = dialog.findViewById(R.id.lesson_list_view);
 
