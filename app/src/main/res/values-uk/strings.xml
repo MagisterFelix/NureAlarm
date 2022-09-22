@@ -45,4 +45,7 @@
     <string name="ok">ОК</string>
     <string name="retry">Повторити спробу</string>
     <string name="add_alarm">Додати будильник</string>
+    <string name="update_available">Доступне нове оновлення!</string>
+    <string name="update">Оновити</string>
+    <string name="downloading">Завантаження</string>
 </resources>

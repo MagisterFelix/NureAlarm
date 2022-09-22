@@ -45,4 +45,7 @@
     <string name="ok">OK</string>
     <string name="retry">Retry</string>
     <string name="add_alarm">Add an alarm</string>
+    <string name="update_available">New update available!</string>
+    <string name="update">Update</string>
+    <string name="downloading">Downloading</string>
 </resources>

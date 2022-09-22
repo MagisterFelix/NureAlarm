@@ -4,7 +4,7 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -36,6 +36,7 @@ import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.network.NetworkInfo;
+import com.nure.alarm.core.updater.Updater;
 import com.nure.alarm.views.dialogs.HelpDialog;
 import com.nure.alarm.views.dialogs.NotSpecifiedInformationDialog;
 import com.nure.alarm.views.dialogs.ReceivingGroupsDialog;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Information information;
     private SessionManager sessionManager;
+    private Updater updater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -212,12 +214,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {}
         });
+
+        if (NetworkInfo.isNetworkAvailable(getApplication())) {
+            updater = new Updater(this, ContextManager.getLocaleContext(getApplicationContext()));
+            updater.checkForUpdates(findViewById(R.id.activity_main), navigation);
+        }
     }
 
     @Override
     protected void onResume() {
         sessionManager.saveLastActivity(getClass().getSimpleName());
         super.onResume();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            updater.update();
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void startAlarmClockActivity(boolean noCheck) {
