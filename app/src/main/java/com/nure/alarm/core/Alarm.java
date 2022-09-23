@@ -60,7 +60,7 @@ public class Alarm {
         notificationTime.set(Calendar.MINUTE, information.getSettingMinute());
         notificationTime.set(Calendar.SECOND, 0);
 
-        if (notificationTime.before(now)) {
+        if (notificationTime.before(now) || notificationTime.equals(now)) {
             notificationTime.add(Calendar.DATE, 1);
         }
 

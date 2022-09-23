@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.nure.alarm.core.Alarm;
 import com.nure.alarm.core.api.Request;
 import com.nure.alarm.core.managers.FileManager;
 
@@ -43,6 +44,7 @@ public class AlarmWorker extends Worker {
     @Override
     public Result doWork() {
         makeRequest();
+        Alarm.enableAlarmWork(getApplicationContext(), FileManager.readInfo(getApplicationContext()));
         return Result.success();
     }
 }

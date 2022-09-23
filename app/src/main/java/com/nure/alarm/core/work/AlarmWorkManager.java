@@ -8,20 +8,22 @@ import android.content.Intent;
 public class AlarmWorkManager {
 
     public static void setAlarmWork(Context context, long time) {
-        PendingIntent alarmWorkManagerReceiver = PendingIntent.getBroadcast(context, 0,
-                new Intent(context, AlarmWorkerReceiver.class).setAction("start"),
+        PendingIntent alarmWorkerReceiver = PendingIntent.getBroadcast(context, 0,
+                new Intent(context, AlarmWorkerReceiver.class),
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, alarmWorkManagerReceiver);
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, alarmWorkerReceiver);
     }
 
     public static void cancelAlarmWork(Context context) {
-        PendingIntent alarmWorkManagerReceiver = PendingIntent.getBroadcast(context, 0,
-                new Intent(context, AlarmWorkerReceiver.class).setAction("cancel"),
+        PendingIntent alarmWorkerReceiver = PendingIntent.getBroadcast(context, 0,
+                new Intent(context, AlarmWorkerReceiver.class),
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(alarmWorkManagerReceiver);
+        alarmManager.cancel(alarmWorkerReceiver);
+
+        AlarmWorkerReceiver.cancelWork(context);
     }
 }

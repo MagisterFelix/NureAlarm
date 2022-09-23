@@ -12,9 +12,6 @@ import androidx.work.WorkManager;
 
 public class AlarmWorkerReceiver extends BroadcastReceiver {
 
-    private static final String ACTION_START = "start";
-    private static final String ACTION_CANCEL = "cancel";
-
     private static final Class<AlarmWorker> ALARM_WORKER_CLASS = AlarmWorker.class;
     private static final Constraints NETWORK_CONNECTED = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
     private static final String ALARM_WORK_TAG = "AlarmWork";
@@ -35,14 +32,6 @@ public class AlarmWorkerReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        String action = intent.getAction();
-
-        if (action.equals(ACTION_START)) {
-            startWork(context);
-        }
-
-        if (action.equals(ACTION_CANCEL)) {
-            cancelWork(context);
-        }
+        startWork(context);
     }
 }
