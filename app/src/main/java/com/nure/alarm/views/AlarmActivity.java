@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,15 +32,17 @@ public class AlarmActivity extends AppCompatActivity {
                 | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         ImageView alarmClock = findViewById(R.id.alarm_clock);
-        alarmClock.setOnClickListener(view -> {
+        ObjectAnimator rotateAnimation = ObjectAnimator.ofFloat(alarmClock, ROTATION_ANIMATION, 0f, 20f, 0f, -20f, 0f);
+        rotateAnimation.setRepeatCount(ValueAnimator.INFINITE);
+        rotateAnimation.setDuration(800);
+        rotateAnimation.start();
+
+        Button dismissAlarmButton = findViewById(R.id.dismiss_alarm_button);
+        dismissAlarmButton.setOnClickListener(view -> {
             Alarm.stopAlarm(getApplicationContext());
             AlarmClockActivity.updateActivity(getApplicationContext());
             finish();
         });
 
-        ObjectAnimator rotateAnimation = ObjectAnimator.ofFloat(alarmClock, ROTATION_ANIMATION, 0f, 20f, 0f, -20f, 0f);
-        rotateAnimation.setRepeatCount(ValueAnimator.INFINITE);
-        rotateAnimation.setDuration(800);
-        rotateAnimation.start();
     }
 }
