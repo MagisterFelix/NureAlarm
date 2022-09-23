@@ -286,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
                 NotSpecifiedInformationDialog notSpecifiedInformationDialog = new NotSpecifiedInformationDialog();
                 notSpecifiedInformationDialog.show(getSupportFragmentManager(), "NotSpecifiedInformationDialog");
             } else {
-                if (NetworkInfo.isNetworkAvailable(getApplication())) {
+                if (NetworkInfo.isNetworkAvailable(getApplication()) || !isChecked) {
                     information.setEnabled(isChecked);
                     FileManager.writeInfo(getApplicationContext(), information);
 
@@ -295,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Alarm.disableAlarmWork(getApplicationContext());
                     }
-                } else{
+                } else {
                     compoundButton.setChecked(false);
                     UnavailableNetworkDialog unavailableNetworkDialog = new UnavailableNetworkDialog();
                     unavailableNetworkDialog.show(getSupportFragmentManager(), "UnavailableNetworkDialog");
