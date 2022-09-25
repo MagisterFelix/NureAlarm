@@ -26,7 +26,7 @@ public class AlarmNotification {
         manager.createNotificationChannel(channel);
 
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0,
-                new Intent(context, AlarmClockActivity.class).putExtra("noCheck", true),
+                new Intent(context, AlarmClockActivity.class).putExtra("checkLastActivity", false),
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
@@ -40,18 +40,18 @@ public class AlarmNotification {
         if (haveLessons != null) {
             if (haveLessons) {
                 PendingIntent changePendingIntent = PendingIntent.getBroadcast(context, 0,
-                        new Intent(context, AlarmNotificationReceiver.class).setAction("change"),
+                        new Intent(context, AlarmNotificationReceiver.class).setAction(AlarmNotificationReceiver.ACTION_CHANGE),
                         PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
                 builder.addAction(R.drawable.ic_lesson, context.getString(R.string.change_lesson), changePendingIntent);
 
                 PendingIntent removePendingIntent = PendingIntent.getBroadcast(context, 0,
-                        new Intent(context, AlarmNotificationReceiver.class).setAction("remove"),
+                        new Intent(context, AlarmNotificationReceiver.class).setAction(AlarmNotificationReceiver.ACTION_REMOVE),
                         PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
                 builder.addAction(R.drawable.ic_remove, context.getString(R.string.remove), removePendingIntent);
             }
         } else {
             PendingIntent retryPendingIntent = PendingIntent.getBroadcast(context, 0,
-                    new Intent(context, AlarmNotificationReceiver.class).setAction("retry"),
+                    new Intent(context, AlarmNotificationReceiver.class).setAction(AlarmNotificationReceiver.ACTION_RETRY),
                     PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
             builder.addAction(R.drawable.ic_retry, context.getString(R.string.retry), retryPendingIntent);
         }

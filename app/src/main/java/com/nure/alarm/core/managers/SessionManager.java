@@ -11,7 +11,7 @@ public class SessionManager {
 
     private final SharedPreferences sharedPreferences;
 
-    private static final String KEY_TIME = "time";
+    private static final String KEY_GROUP_REQUEST_TIME = "group_request_time";
     private static final String KEY_LOCALE = "locale";
     private static final String KEY_LAST_ACTIVITY = "last_activity";
 
@@ -19,16 +19,16 @@ public class SessionManager {
         sharedPreferences = context.getSharedPreferences(context.getString(R.string.app_name), Context.MODE_PRIVATE);
     }
 
-    public void saveTime(long time) {
+    public void saveGroupRequestTime(long time) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putLong(KEY_TIME, time);
+        editor.putLong(KEY_GROUP_REQUEST_TIME, time);
         editor.apply();
     }
 
-    public long fetchTime() {
+    public long fetchGroupRequestTime() {
         Calendar fromStart = Calendar.getInstance();
         fromStart.setTimeInMillis(0);
-        return sharedPreferences.getLong(KEY_TIME, fromStart.getTimeInMillis());
+        return sharedPreferences.getLong(KEY_GROUP_REQUEST_TIME, fromStart.getTimeInMillis());
     }
 
     public void saveLocale(String locale) {

@@ -83,7 +83,7 @@ public class AlarmService extends Service {
                     new Intent(context, AlarmActivity.class),
                     PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
             PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 0,
-                    new Intent(context, AlarmNotificationReceiver.class).setAction("dismiss"),
+                    new Intent(context, AlarmNotificationReceiver.class).setAction(AlarmNotificationReceiver.ACTION_DISMISS),
                     PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)

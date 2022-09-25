@@ -54,7 +54,7 @@ public class Request {
     public void getGroups(Activity activity, FragmentManager fragmentManager, TextView groupTextView) {
         ReceivingGroupsDialog receivingGroupsDialog = new ReceivingGroupsDialog();
         receivingGroupsDialog.setCancelable(false);
-        receivingGroupsDialog.show(fragmentManager, "ReceivingGroupsDialog");
+        receivingGroupsDialog.show(fragmentManager, ReceivingGroupsDialog.class.getSimpleName());
 
         apiClient.getApiService().group().enqueue(new Callback<Object>() {
             @Override
@@ -68,7 +68,7 @@ public class Request {
                         }).create();
 
                 FileManager.writeGroups(context, gson.toJson(response.body()));
-                new SessionManager(context).saveTime(Calendar.getInstance().getTimeInMillis());
+                new SessionManager(context).saveGroupRequestTime(Calendar.getInstance().getTimeInMillis());
 
                 try {
                     receivingGroupsDialog.dismiss();
@@ -83,7 +83,7 @@ public class Request {
                 try {
                     receivingGroupsDialog.dismiss();
                     FailedGroupsRequestDialog failedGroupsRequestDialog = new FailedGroupsRequestDialog();
-                    failedGroupsRequestDialog.show(fragmentManager, "FailedGroupsRequestDialog");
+                    failedGroupsRequestDialog.show(fragmentManager, FailedGroupsRequestDialog.class.getSimpleName());
                 } catch (IllegalStateException e) {
                     e.printStackTrace();
                 }
@@ -91,9 +91,9 @@ public class Request {
         });
     }
 
-    public void getTimeTable(String from_date, String to_date, long group_id) {
+    public void getTimeTable(String date, long group_id) {
         String unformatted_query = "778:201::::201:P201_FIRST_DATE,P201_LAST_DATE,P201_GROUP,P201_POTOK:%s,%s,%d,0:";
-        String query = String.format(Locale.getDefault(), unformatted_query, from_date, to_date, group_id);
+        String query = String.format(Locale.getDefault(), unformatted_query, date, date, group_id);
 
         apiClient.getApiService().timetable(query).enqueue(new Callback<ResponseBody>() {
             @Override

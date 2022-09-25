@@ -5,6 +5,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.fragment.app.FragmentManager;
+
 import com.nure.alarm.R;
 import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.models.Information;
@@ -12,6 +14,7 @@ import com.nure.alarm.core.notification.AlarmNotification;
 import com.nure.alarm.core.work.AlarmWorkManager;
 import com.nure.alarm.views.AlarmClockActivity;
 import com.nure.alarm.views.MainActivity;
+import com.nure.alarm.views.dialogs.ConfirmationDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -67,9 +70,12 @@ public class Alarm {
         AlarmWorkManager.setAlarmWork(context, notificationTime.getTimeInMillis());
     }
 
-    public static void disableAlarmWork(Context context) {
+    public static void disableAlarmWork(Context context, FragmentManager fragmentManager) {
         AlarmWorkManager.cancelAlarmWork(context);
-        cancelAlarm(context);
+        if (FileManager.readInfo(context).getAlarm().length() != 0) {
+            ConfirmationDialog confirmationDialog = new ConfirmationDialog();
+            confirmationDialog.show(fragmentManager, ConfirmationDialog.class.getSimpleName());
+        }
     }
 
     public static void startAlarm(Context context, JSONObject lesson, int delay) {
@@ -97,7 +103,8 @@ public class Alarm {
             if (information.getAlarm().length() == 0 || !information.getAlarm().getString("time").equals(formatted_time)) {
                 JSONObject alarm = new JSONObject();
                 alarm.put("time", formatted_time);
-                alarm.put("lesson", lesson.getString("name"));
+                alarm.put("number", lesson.getString("number"));
+                alarm.put("name", lesson.getString("name"));
 
                 information.setAlarm(alarm);
                 FileManager.writeInfo(context, information);

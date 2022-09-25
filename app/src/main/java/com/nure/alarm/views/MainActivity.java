@@ -29,6 +29,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.nure.alarm.R;
 import com.nure.alarm.core.Alarm;
+import com.nure.alarm.core.activity.Helper;
 import com.nure.alarm.core.api.Request;
 import com.nure.alarm.core.managers.ContextManager;
 import com.nure.alarm.core.managers.FileManager;
@@ -65,15 +66,11 @@ public class MainActivity extends AppCompatActivity {
         information = FileManager.readInfo(getApplicationContext());
         sessionManager = new SessionManager(getApplicationContext());
 
-        if (getIntent().getExtras() == null && !getClass().getSimpleName().equals(sessionManager.fetchLastActivity())) {
-            startAlarmClockActivity(false);
-        }
-
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setSelectedItemId(R.id.alarm_settings);
         navigation.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.alarm_clock) {
-                startAlarmClockActivity(true);
+                startAlarmClockActivity(false);
                 return true;
             }
             return false;
@@ -88,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                 FileManager.writeInfo(getApplicationContext(), information);
 
                 if (information.isEnabled()) {
-                    Alarm.disableAlarmWork(getApplicationContext());
+                    Alarm.disableAlarmWork(getApplicationContext(), getSupportFragmentManager());
                     Alarm.enableAlarmWork(getApplicationContext(), information);
                 }
 
@@ -117,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             if (NetworkInfo.isNetworkAvailable(getApplication())) {
                 Calendar now = Calendar.getInstance();
                 Calendar lastTime = Calendar.getInstance();
-                lastTime.setTimeInMillis(sessionManager.fetchTime());
+                lastTime.setTimeInMillis(sessionManager.fetchGroupRequestTime());
 
                 if (TimeUnit.MILLISECONDS.toDays(now.getTimeInMillis() - lastTime.getTimeInMillis()) > 0
                         || FileManager.readGroups(getApplicationContext()).size() == 0) {
@@ -128,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else {
                 UnavailableNetworkDialog unavailableNetworkDialog = new UnavailableNetworkDialog();
-                unavailableNetworkDialog.show(getSupportFragmentManager(), "UnavailableNetworkDialog");
+                unavailableNetworkDialog.show(getSupportFragmentManager(), UnavailableNetworkDialog.class.getSimpleName());
             }
         });
 
@@ -153,6 +150,10 @@ public class MainActivity extends AppCompatActivity {
             updater = new Updater(this, ContextManager.getLocaleContext(getApplicationContext()));
             updater.checkForUpdates(findViewById(R.id.activity_main), navigation);
         }
+
+        if (getIntent().getExtras() == null && !getClass().getSimpleName().equals(sessionManager.fetchLastActivity())) {
+            startAlarmClockActivity(true);
+        }
     }
 
     @Override
@@ -174,14 +175,10 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void startAlarmClockActivity(boolean noCheck) {
+    private void startAlarmClockActivity(boolean checkLastActivity) {
         Intent alarmClockActivity = new Intent(getApplicationContext(), AlarmClockActivity.class);
-        if (noCheck) {
-            alarmClockActivity.putExtra("noCheck", true);
-        }
-        startActivity(alarmClockActivity);
-        finish();
-        overridePendingTransition(0, 0);
+        alarmClockActivity.putExtra(Helper.CHECK_LAST_ACTIVITY, checkLastActivity);
+        Helper.startActivity(MainActivity.this, alarmClockActivity);
     }
 
     public static void showGroups(Activity activity, Context context, TextView groupTextView) {
@@ -243,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
         MenuItem help = menu.findItem(R.id.help);
         help.setOnMenuItemClickListener(menuItem -> {
             HelpDialog helpDialog = new HelpDialog();
-            helpDialog.show(getSupportFragmentManager(), "HelpDialog");
+            helpDialog.show(getSupportFragmentManager(), HelpDialog.class.getSimpleName());
             return true;
         });
 
@@ -256,9 +253,8 @@ public class MainActivity extends AppCompatActivity {
                 sessionManager.saveLocale("en");
             }
             menuItem.setIcon(sessionManager.fetchLocale().equals("uk") ? R.mipmap.ic_uk : R.mipmap.ic_en);
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-            finish();
-            overridePendingTransition(0, 0);
+            Intent mainActivity = new Intent(getApplicationContext(), MainActivity.class);
+            Helper.startActivity(MainActivity.this, mainActivity);
             return true;
         });
 
@@ -270,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
             if (information.getSettingHour() == -1 && information.getSettingMinute() == -1 || information.getGroup().length() == 0) {
                 compoundButton.setChecked(false);
                 NotSpecifiedInformationDialog notSpecifiedInformationDialog = new NotSpecifiedInformationDialog();
-                notSpecifiedInformationDialog.show(getSupportFragmentManager(), "NotSpecifiedInformationDialog");
+                notSpecifiedInformationDialog.show(getSupportFragmentManager(), NotSpecifiedInformationDialog.class.getSimpleName());
             } else {
                 if (NetworkInfo.isNetworkAvailable(getApplication()) || !isChecked) {
                     information.setEnabled(isChecked);
@@ -279,12 +275,12 @@ public class MainActivity extends AppCompatActivity {
                     if (isChecked) {
                         Alarm.enableAlarmWork(getApplicationContext(), information);
                     } else {
-                        Alarm.disableAlarmWork(getApplicationContext());
+                        Alarm.disableAlarmWork(getApplicationContext(), getSupportFragmentManager());
                     }
                 } else {
                     compoundButton.setChecked(false);
                     UnavailableNetworkDialog unavailableNetworkDialog = new UnavailableNetworkDialog();
-                    unavailableNetworkDialog.show(getSupportFragmentManager(), "UnavailableNetworkDialog");
+                    unavailableNetworkDialog.show(getSupportFragmentManager(), UnavailableNetworkDialog.class.getSimpleName());
                 }
             }
         });
