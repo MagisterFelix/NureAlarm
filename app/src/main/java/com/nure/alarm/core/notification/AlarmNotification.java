@@ -21,7 +21,7 @@ public class AlarmNotification {
     private static final String NOTIFICATION_NAME = "Alarm notification";
 
     public static void sendNotification(Context context, String message, @Nullable Boolean haveLessons) {
-        NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL, NOTIFICATION_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+        NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL, NOTIFICATION_NAME, NotificationManager.IMPORTANCE_HIGH);
         NotificationManager manager = context.getSystemService(NotificationManager.class);
         manager.createNotificationChannel(channel);
 
