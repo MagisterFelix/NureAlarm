@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".views.AlarmClockActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/navigation"
+        android:gravity="center"
+        android:padding="10dp">
+
+        <RelativeLayout
+            android:id="@+id/alarm_no_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/image_no_alarm"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginEnd="10dp"
+                android:layout_centerVertical="true"
+                android:contentDescription="@string/alarm_clock"
+                android:src="@drawable/ic_alarm_clock" />
+
+            <TextView
+                android:id="@+id/title_no_alarm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/image_no_alarm"
+                android:layout_marginStart="10dp"
+                android:text="@string/no_alarm"
+                android:textAlignment="center"
+                android:textSize="28sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/alarm_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/lesson_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@id/image_time"
+                android:layout_alignEnd="@id/image_time"
+                android:layout_centerHorizontal="true"
+                android:textAlignment="center"
+                android:textSize="32sp" />
+
+            <RelativeLayout
+                android:id="@+id/image_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/lesson_name"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="20dp">
+
+                <ImageView
+                    android:id="@+id/image_alarm"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginEnd="10dp"
+                    android:contentDescription="@string/alarm_clock"
+                    android:src="@drawable/ic_alarm_clock" />
+
+                <TextView
+                    android:id="@+id/alarm_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@id/image_alarm"
+                    android:textSize="42sp"
+                    android:textStyle="bold" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/change_remove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/image_time"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="20dp">
+
+                <Button
+                    android:id="@+id/change"
+                    android:layout_width="wrap_content"
+                    android:layout_height="64dp"
+                    android:layout_marginEnd="5dp"
+                    android:backgroundTint="@color/blue"
+                    android:text="@string/change_lesson" />
+
+                <Button
+                    android:id="@+id/remove"
+                    android:layout_width="wrap_content"
+                    android:layout_height="64dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_toEndOf="@id/change"
+                    android:backgroundTint="@color/red"
+                    android:text="@string/remove" />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/lesson"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_above="@id/navigation"
+        android:background="@drawable/shadow" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:padding="10dp"
+        app:menu="@menu/navigation_menu" />
+
+</RelativeLayout>

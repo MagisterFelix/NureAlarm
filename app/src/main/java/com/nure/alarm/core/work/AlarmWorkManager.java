@@ -1,32 +1,29 @@
 package com.nure.alarm.core.work;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
-
-import androidx.work.Constraints;
-import androidx.work.ExistingWorkPolicy;
-import androidx.work.NetworkType;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-
-import java.util.concurrent.TimeUnit;
+import android.content.Intent;
 
 public class AlarmWorkManager {
-    private final static Class<AlarmWorker> ALARM_WORKER_CLASS = AlarmWorker.class;
-    private final static Constraints NETWORK_CONNECTED = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
-    private final static String ALARM_WORK_TAG = "AlarmWork";
 
-    public static void startWork(Context context, long delay) {
-        OneTimeWorkRequest request = new OneTimeWorkRequest
-                .Builder(ALARM_WORKER_CLASS)
-                .setConstraints(NETWORK_CONNECTED)
-                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                .addTag(ALARM_WORK_TAG)
-                .build();
+    public static void setAlarmWork(Context context, long time) {
+        PendingIntent alarmWorkerReceiver = PendingIntent.getBroadcast(context, 0,
+                new Intent(context, AlarmWorkerReceiver.class),
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
-        WorkManager.getInstance(context).enqueueUniqueWork(ALARM_WORK_TAG, ExistingWorkPolicy.REPLACE, request);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, alarmWorkerReceiver);
     }
 
-    public static void cancelWork(Context context) {
-        WorkManager.getInstance(context).cancelUniqueWork(ALARM_WORK_TAG);
+    public static void cancelAlarmWork(Context context) {
+        PendingIntent alarmWorkerReceiver = PendingIntent.getBroadcast(context, 0,
+                new Intent(context, AlarmWorkerReceiver.class),
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(alarmWorkerReceiver);
+
+        AlarmWorkerReceiver.cancelWork(context);
     }
 }

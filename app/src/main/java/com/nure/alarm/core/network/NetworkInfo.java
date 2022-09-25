@@ -6,9 +6,9 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 
-public class NetworkStatus {
+public class NetworkInfo {
 
-    public static boolean isAvailable(Application application) {
+    public static boolean isNetworkAvailable(Application application) {
         ConnectivityManager connectivityManager = (ConnectivityManager) application.getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
         if (network == null) {
@@ -18,7 +18,6 @@ public class NetworkStatus {
         return networkCapabilities != null
                 && (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
                 || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
-                || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
-                || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH));
+                || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET));
     }
 }

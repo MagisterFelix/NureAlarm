@@ -7,14 +7,17 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
-    private final static Class<ApiService> API_SERVICE_CLASS = ApiService.class;
 
     private ApiService apiService;
+    private static final Class<ApiService> API_SERVICE_CLASS = ApiService.class;
+
+    private static final String COOKIE_NAME = "cookieName";
+    private static final String COOKIE_VALUE = "cookieValue";
 
     public ApiService getApiService() {
         if (apiService == null) {
             OkHttp3CookieHelper cookieHelper = new OkHttp3CookieHelper();
-            cookieHelper.setCookie(Endpoint.BASE, "cookieName", "cookieValue");
+            cookieHelper.setCookie(Endpoint.BASE, COOKIE_NAME, COOKIE_VALUE);
 
             OkHttpClient client = new OkHttpClient.Builder()
                     .cookieJar(cookieHelper.cookieJar())

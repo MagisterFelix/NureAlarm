@@ -1,89 +1,125 @@
 package com.nure.alarm.core;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.provider.AlarmClock;
-import android.widget.Toast;
+
+import androidx.fragment.app.FragmentManager;
 
 import com.nure.alarm.R;
+import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.notification.AlarmNotification;
 import com.nure.alarm.core.work.AlarmWorkManager;
+import com.nure.alarm.views.AlarmClockActivity;
+import com.nure.alarm.views.MainActivity;
+import com.nure.alarm.views.dialogs.ConfirmationDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Objects;
 
 public class Alarm {
-    private final static int ZERO_SECONDS = 0;
-    private final static int ONE_DAY = 1;
-    private final static boolean SKIP_UI = true;
 
-    public static void setAlarm(Context context, int hour, int minute) {
-        Intent alarmIntent = new Intent(AlarmClock.ACTION_SET_ALARM);
-        alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        alarmIntent.putExtra(AlarmClock.EXTRA_MESSAGE, "NureAlarm");
-        alarmIntent.putExtra(AlarmClock.EXTRA_HOUR, hour);
-        alarmIntent.putExtra(AlarmClock.EXTRA_MINUTES, minute);
-        alarmIntent.putExtra(AlarmClock.EXTRA_SKIP_UI, SKIP_UI);
-        context.startActivity(alarmIntent);
+    private static final int MILLISECONDS_IN_MINUTE = 60000;
+
+    public static void setAlarm(Context context, long time) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        PendingIntent mainActivity = PendingIntent.getActivity(context, 0,
+                new Intent(context, MainActivity.class),
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent alarmReceiver = PendingIntent.getBroadcast(context, 0,
+                new Intent(context, AlarmReceiver.class),
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+
+        alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(time, mainActivity), alarmReceiver);
+        AlarmClockActivity.updateActivity(context);
     }
 
     public static void cancelAlarm(Context context) {
-        Configuration configuration = new Configuration(context.getResources().getConfiguration());
-        configuration.setLocale(new Locale(new SessionManager(context).fetchLocale()));
-        Toast.makeText(context, context.createConfigurationContext(configuration).getString(R.string.remove_alarm_message), Toast.LENGTH_LONG).show();
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        Intent alarmIntent = new Intent(AlarmClock.ACTION_DISMISS_ALARM);
-        alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(alarmIntent);
+        PendingIntent alarmReceiver = PendingIntent.getBroadcast(context, 0,
+                new Intent(context, AlarmReceiver.class),
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.cancel(alarmReceiver);
+
+        Information information = FileManager.readInfo(context);
+        information.setAlarm(new JSONObject());
+        FileManager.writeInfo(context, information);
     }
 
     public static void enableAlarmWork(Context context, Information information) {
         Calendar now = Calendar.getInstance();
 
-        Calendar startTime = Calendar.getInstance();
-        startTime.set(Calendar.HOUR_OF_DAY, information.getSettingHour());
-        startTime.set(Calendar.MINUTE, information.getSettingMinute());
-        startTime.set(Calendar.SECOND, ZERO_SECONDS);
+        Calendar notificationTime = Calendar.getInstance();
+        notificationTime.set(Calendar.HOUR_OF_DAY, information.getSettingHour());
+        notificationTime.set(Calendar.MINUTE, information.getSettingMinute());
+        notificationTime.set(Calendar.SECOND, 0);
 
-        if (startTime.before(now)) {
-            startTime.add(Calendar.DATE, ONE_DAY);
+        if (notificationTime.before(now) || notificationTime.equals(now)) {
+            notificationTime.add(Calendar.DATE, 1);
         }
 
-        long delay = startTime.getTimeInMillis() - now.getTimeInMillis();
-        AlarmWorkManager.startWork(context, delay);
+        AlarmWorkManager.setAlarmWork(context, notificationTime.getTimeInMillis());
     }
 
-    public static void disableAlarmWork(Context context, Information information) {
-        AlarmWorkManager.cancelWork(context);
-        if (information.isSet()) {
-            information.setSet(false);
-            FileManager.writeInfo(context, information);
-            cancelAlarm(context);
+    public static void disableAlarmWork(Context context, FragmentManager fragmentManager) {
+        AlarmWorkManager.cancelAlarmWork(context);
+        if (FileManager.readInfo(context).getAlarm().length() != 0) {
+            ConfirmationDialog confirmationDialog = new ConfirmationDialog();
+            confirmationDialog.show(fragmentManager, ConfirmationDialog.class.getSimpleName());
         }
     }
 
     public static void startAlarm(Context context, JSONObject lesson, int delay) {
         try {
-            String string_time = lesson.getString("time").split(" ")[0];
-            Calendar time = Calendar.getInstance();
-            time.setTime(Objects.requireNonNull(new SimpleDateFormat("HH:mm", Locale.getDefault()).parse(string_time)));
-            time.add(Calendar.MILLISECOND, -(delay * 60000));
+            Calendar now = Calendar.getInstance();
 
-            Alarm.setAlarm(context, time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE));
+            int[] time = Arrays.stream(lesson.getString("time").split("[: ]+")).mapToInt(Integer::parseInt).toArray();
+
+            Calendar date = Calendar.getInstance();
+            date.set(Calendar.HOUR_OF_DAY, time[0]);
+            date.set(Calendar.MINUTE, time[1]);
+            date.set(Calendar.SECOND, 0);
+            date.add(Calendar.MILLISECOND, -(delay * MILLISECONDS_IN_MINUTE));
+
+            if (date.before(now)) {
+                date.add(Calendar.DATE, 1);
+            }
 
             String unformatted_message = context.getString(R.string.lessons_message);
             String message = String.format(Locale.getDefault(), unformatted_message, lesson.getString("number"), lesson.getString("name"));
-            AlarmNotification.sendNotification(context, message, true);
-        } catch (JSONException | ParseException e) {
+            String formatted_time = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(date.getTime());
+
+            Information information = FileManager.readInfo(context);
+
+            if (information.getAlarm().length() == 0 || !information.getAlarm().getString("time").equals(formatted_time)) {
+                JSONObject alarm = new JSONObject();
+                alarm.put("time", formatted_time);
+                alarm.put("number", lesson.getString("number"));
+                alarm.put("name", lesson.getString("name"));
+
+                information.setAlarm(alarm);
+                FileManager.writeInfo(context, information);
+
+                Alarm.setAlarm(context, date.getTimeInMillis());
+                AlarmNotification.sendNotification(context, message, true);
+            }
+        } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void stopAlarm(Context context) {
+        Intent alarmService = new Intent(context, AlarmService.class);
+        context.stopService(alarmService);
+        cancelAlarm(context);
     }
 }

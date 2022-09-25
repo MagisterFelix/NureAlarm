@@ -7,8 +7,8 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.nure.alarm.core.Alarm;
-import com.nure.alarm.core.FileManager;
 import com.nure.alarm.core.api.Request;
+import com.nure.alarm.core.managers.FileManager;
 
 import org.json.JSONException;
 
@@ -22,29 +22,24 @@ public class AlarmWorker extends Worker {
         super(context, workerParams);
     }
 
-    private String getDate() {
+    @NonNull
+    @Override
+    public Result doWork() {
         Calendar date = Calendar.getInstance();
         if (date.get(Calendar.HOUR_OF_DAY) > 7) {
             date.add(Calendar.DATE, 1);
         }
-        return new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date.getTime());
-    }
 
-    private void makeRequest() {
-        String date = getDate();
         try {
             Request request = new Request(getApplicationContext());
-            request.getTimeTable(date, date, FileManager.readInfo(getApplicationContext()).getGroup().getLong("id"));
+            request.getTimeTable(new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date.getTime()),
+                    FileManager.readInfo(getApplicationContext()).getGroup().getLong("id"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
 
-    @NonNull
-    @Override
-    public Result doWork() {
-        makeRequest();
         Alarm.enableAlarmWork(getApplicationContext(), FileManager.readInfo(getApplicationContext()));
+
         return Result.success();
     }
 }

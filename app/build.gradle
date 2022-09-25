@@ -9,8 +9,8 @@ android {
         applicationId "com.nure.alarm"
         minSdk 26
         targetSdk 26
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -19,6 +19,14 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        applicationVariants.all{
+            variant ->
+                variant.outputs.each{
+                    output->
+                        def name = "NureAlarm.apk"
+                        output.outputFileName = name
+                }
         }
     }
     compileOptions {
@@ -35,7 +43,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'org.riversun:okhttp3-cookie-helper:1.0.0'
     implementation "androidx.work:work-runtime:2.7.1"
-    implementation 'androidx.appcompat:appcompat:1.5.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
