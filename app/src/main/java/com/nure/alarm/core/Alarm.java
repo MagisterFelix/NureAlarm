@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentManager;
 import com.nure.alarm.R;
 import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.notification.AlarmNotification;
 import com.nure.alarm.core.work.AlarmWorkManager;
 import com.nure.alarm.views.AlarmClockActivity;
@@ -20,7 +21,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -83,11 +83,11 @@ public class Alarm {
         try {
             Calendar now = Calendar.getInstance();
 
-            int[] time = Arrays.stream(lesson.getString("time").split("[: ]+")).mapToInt(Integer::parseInt).toArray();
+            Time time = new Time(lesson.getString("time"));
 
             Calendar date = Calendar.getInstance();
-            date.set(Calendar.HOUR_OF_DAY, time[0]);
-            date.set(Calendar.MINUTE, time[1]);
+            date.set(Calendar.HOUR_OF_DAY, time.getHour());
+            date.set(Calendar.MINUTE, time.getMinute());
             date.set(Calendar.SECOND, 0);
             date.add(Calendar.MILLISECOND, -(information.getActivation() * MILLISECONDS_IN_MINUTE));
 
