@@ -10,6 +10,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.text.Spanned;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +33,7 @@ import com.nure.alarm.core.managers.ContextManager;
 import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
 import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.network.NetworkInfo;
 import com.nure.alarm.core.notification.AlarmNotificationReceiver;
 import com.nure.alarm.core.utils.ActivityUtils;
@@ -46,6 +48,8 @@ import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class AlarmClockActivity extends AppCompatActivity {
 
@@ -83,8 +87,43 @@ public class AlarmClockActivity extends AppCompatActivity {
                 TextView lesson = findViewById(R.id.lesson_name);
                 lesson.setText(information.getAlarm().getString("name"));
 
-                TextView time = findViewById(R.id.alarm_time);
-                time.setText(information.getAlarm().getString("time"));
+                TextView alarm_time = findViewById(R.id.alarm_time);
+                alarm_time.setText(information.getAlarm().getString("time"));
+
+                TextView time_left = findViewById(R.id.alarm_time_left);
+
+                Calendar now = Calendar.getInstance();
+                Time time = new Time(information.getAlarm().getString("time"));
+
+                Calendar date = Calendar.getInstance();
+                date.set(Calendar.HOUR_OF_DAY, time.getHour());
+                date.set(Calendar.MINUTE, time.getMinute());
+                date.set(Calendar.SECOND, 0);
+
+                if (date.before(now)) {
+                    date.add(Calendar.DATE, 1);
+                }
+
+                new CountDownTimer(date.getTimeInMillis() - now.getTimeInMillis(),1000) {
+
+                    @Override
+                    public void onTick(long millis) {
+                        int hours   = (int) ((millis / (1000 * 60 * 60)) % 24);
+                        int minutes = (int) ((millis / (1000 * 60)) % 60);
+
+                        String text = String.format(
+                                Locale.getDefault(),
+                                ContextManager.getLocaleContext(getApplicationContext()).getString(R.string.time_left), hours, minutes
+                        );
+                        time_left.setText(text);
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        time_left.setVisibility(View.GONE);
+                    }
+
+                }.start();
 
                 Button change = findViewById(R.id.change);
                 change.setOnClickListener(view -> changeLesson());
