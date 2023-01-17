@@ -74,22 +74,22 @@
                 app:drawableEndCompat="@drawable/ic_arrow" />
 
             <TextView
-                android:id="@+id/label_delay"
+                android:id="@+id/label_activation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignStart="@+id/delay"
-                android:layout_alignEnd="@id/delay"
+                android:layout_alignStart="@+id/activation"
+                android:layout_alignEnd="@id/activation"
                 android:layout_marginBottom="2dp"
                 android:layout_toEndOf="@+id/label_group"
-                android:text="@string/label_delay"
+                android:text="@string/label_activation"
                 android:textAlignment="center"
                 android:textSize="18sp" />
 
             <Spinner
-                android:id="@+id/delay"
+                android:id="@+id/activation"
                 android:layout_width="140dp"
                 android:layout_height="60dp"
-                android:layout_below="@+id/label_delay"
+                android:layout_below="@+id/label_activation"
                 android:layout_toEndOf="@+id/group"
                 android:background="@android:drawable/editbox_background"
                 android:gravity="center_vertical"

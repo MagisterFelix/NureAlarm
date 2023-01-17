@@ -1,9 +1,9 @@
-package com.nure.alarm.core.activity;
+package com.nure.alarm.core.utils;
 
 import android.app.Activity;
 import android.content.Intent;
 
-public class Helper {
+public class ActivityUtils {
 
     public static String CHECK_LAST_ACTIVITY = "checkLastActivity";
 

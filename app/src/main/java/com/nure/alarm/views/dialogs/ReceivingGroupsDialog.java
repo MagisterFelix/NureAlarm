@@ -17,7 +17,7 @@ public class ReceivingGroupsDialog extends AppCompatDialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.receiving_groups_dialog)
-                .setView(R.layout.loading);
+                .setView(R.layout.loading_groups);
         return builder.create();
     }
 }

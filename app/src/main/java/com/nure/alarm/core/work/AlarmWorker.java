@@ -9,12 +9,12 @@ import androidx.work.WorkerParameters;
 import com.nure.alarm.core.Alarm;
 import com.nure.alarm.core.api.Request;
 import com.nure.alarm.core.managers.FileManager;
+import com.nure.alarm.core.models.DateRange;
+import com.nure.alarm.core.models.Information;
 
 import org.json.JSONException;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
 
 public class AlarmWorker extends Worker {
 
@@ -26,19 +26,23 @@ public class AlarmWorker extends Worker {
     @Override
     public Result doWork() {
         Calendar date = Calendar.getInstance();
-        if (date.get(Calendar.HOUR_OF_DAY) > 7) {
+
+        if (date.get(Calendar.HOUR_OF_DAY) > 6) {
             date.add(Calendar.DATE, 1);
         }
 
-        try {
-            Request request = new Request(getApplicationContext());
-            request.getTimeTable(new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date.getTime()),
-                    FileManager.readInfo(getApplicationContext()).getGroup().getLong("id"));
-        } catch (JSONException e) {
-            e.printStackTrace();
+        Information information = FileManager.readInfo(getApplicationContext());
+
+        if (information.getAlarm().length() == 0) {
+            try {
+                Request request = new Request(getApplicationContext());
+                request.getTimeTable(new DateRange(date, date), information.getGroup().getLong("id"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
-        Alarm.enableAlarmWork(getApplicationContext(), FileManager.readInfo(getApplicationContext()));
+        Alarm.enableAlarmWork(getApplicationContext(), information);
 
         return Result.success();
     }

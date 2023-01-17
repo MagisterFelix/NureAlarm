@@ -11,9 +11,11 @@ public class NetworkInfo {
     public static boolean isNetworkAvailable(Application application) {
         ConnectivityManager connectivityManager = (ConnectivityManager) application.getSystemService(Context.CONNECTIVITY_SERVICE);
         Network network = connectivityManager.getActiveNetwork();
+
         if (network == null) {
             return false;
         }
+
         NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
         return networkCapabilities != null
                 && (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)

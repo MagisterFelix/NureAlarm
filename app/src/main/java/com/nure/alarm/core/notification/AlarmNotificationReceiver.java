@@ -38,6 +38,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                 if (action.equals(ACTION_RETRY)) {
                     AlarmWorkerReceiver.startWork(context);
                 }
+
                 AlarmClockActivity.updateActivity(context);
             }
         }

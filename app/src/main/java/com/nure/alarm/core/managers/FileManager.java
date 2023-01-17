@@ -5,6 +5,7 @@ import android.content.Context;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.models.Time;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,9 +24,8 @@ public class FileManager {
     private static final String GROUPS_FILE = "groups.json";
 
     private static final boolean DISABLED = false;
-    private static final int DEFAULT_SETTING_HOUR = 20;
-    private static final int DEFAULT_SETTING_MINUTE = 0;
-    private static final int DEFAULT_DELAY = 30;
+    private static final Time DEFAULT_SETTING_TIME = new Time(20, 0);
+    private static final int DEFAULT_ACTIVATION = 30;
     private static final JSONObject UNDEFINED_GROUP = new JSONObject();
     private static final JSONArray UNDEFINED_LESSONS = new JSONArray();
     private static final JSONObject UNDEFINED_ALARM = new JSONObject();
@@ -49,10 +49,10 @@ public class FileManager {
         createIfNotExist(context, file);
 
         StringBuilder data = new StringBuilder();
-
         try {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(context.openFileInput(file)));
             String line;
+
             while ((line = bufferedReader.readLine()) != null) {
                 data.append(line).append("\n");
             }
@@ -79,9 +79,8 @@ public class FileManager {
 
             return new Information(
                     object.getBoolean("enabled"),
-                    object.getInt("settingHour"),
-                    object.getInt("settingMinute"),
-                    object.getInt("delay"),
+                    new Time(object.getInt("settingHour"), object.getInt("settingMinute")),
+                    object.getInt("activation"),
                     object.getJSONObject("group"),
                     object.getJSONArray("lessons"),
                     object.getJSONObject("alarm")
@@ -90,7 +89,14 @@ public class FileManager {
             e.printStackTrace();
         }
 
-        return new Information(DISABLED, DEFAULT_SETTING_HOUR, DEFAULT_SETTING_MINUTE, DEFAULT_DELAY, UNDEFINED_GROUP, UNDEFINED_LESSONS, UNDEFINED_ALARM);
+        return new Information(
+                DISABLED,
+                DEFAULT_SETTING_TIME,
+                DEFAULT_ACTIVATION,
+                UNDEFINED_GROUP,
+                UNDEFINED_LESSONS,
+                UNDEFINED_ALARM
+        );
     }
 
     public static void writeInfo(Context context, Information information) {
@@ -98,11 +104,11 @@ public class FileManager {
             JSONObject object = new JSONObject();
 
             object.put("enabled", information.isEnabled());
-            object.put("settingHour", information.getSettingHour());
-            object.put("settingMinute", information.getSettingMinute());
+            object.put("settingHour", information.getSettingTime().getHour());
+            object.put("settingMinute", information.getSettingTime().getMinute());
             object.put("group", information.getGroup());
             object.put("lessons", information.getLessons());
-            object.put("delay", information.getDelay());
+            object.put("activation", information.getActivation());
             object.put("alarm", information.getAlarm());
 
             writeJSON(context, object, INFO_FILE);
@@ -121,7 +127,6 @@ public class FileManager {
                     groups.put(jsonObject.getString("name"), jsonObject.getInt("id"));
                 }
             }
-
             return groups;
         } catch (IOException | JSONException e) {
             e.printStackTrace();

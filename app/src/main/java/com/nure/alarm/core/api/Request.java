@@ -16,6 +16,7 @@ import com.nure.alarm.core.Alarm;
 import com.nure.alarm.core.managers.ContextManager;
 import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
+import com.nure.alarm.core.models.DateRange;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.notification.AlarmNotification;
 import com.nure.alarm.views.AlarmClockActivity;
@@ -91,9 +92,9 @@ public class Request {
         });
     }
 
-    public void getTimeTable(String date, long group_id) {
-        String unformatted_query = "778:201::::201:P201_FIRST_DATE,P201_LAST_DATE,P201_GROUP,P201_POTOK:%s,%s,%d,0:";
-        String query = String.format(Locale.getDefault(), unformatted_query, date, date, group_id);
+    public void getTimeTable(DateRange dateRange, long group_id) {
+        String unformatted_query = "778:201::::201:P201_FIRST_DATE,P201_LAST_DATE,P201_GROUP,P201_POTOK:%s,%d,0:";
+        String query = String.format(Locale.getDefault(), unformatted_query, dateRange.getRange(), group_id);
 
         apiClient.getApiService().timetable(query).enqueue(new Callback<ResponseBody>() {
             @Override
@@ -103,15 +104,17 @@ public class Request {
 
                     String html = Objects.requireNonNull(response.body()).string();
                     Document document = Jsoup.parse(html);
-                    Elements elements = document.select("tr");
-                    for (Element element : elements.subList(2, elements.size() - 1)) {
-                        if (element.children().size() == 3){
-                            JSONObject object = new JSONObject();
-                            object.put("number", element.child(0).text());
-                            object.put("time", element.child(1).text());
-                            object.put("name", element.child(2).text());
-                            lessons.put(object);
-                        }
+                    Element table = document.select("table[class=MainTT]").first();
+                    Elements elements = table.select("tr:has(td[class=left])");
+
+                    for (Element element : elements) {
+                        JSONObject lesson = new JSONObject();
+
+                        lesson.put("number", Integer.parseInt(element.child(0).text()));
+                        lesson.put("time", element.child(1).text());
+                        lesson.put("name", element.child(2).select("a").text());
+
+                        lessons.put(lesson);
                     }
 
                     Information information = FileManager.readInfo(context);
@@ -122,7 +125,7 @@ public class Request {
                         AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), false);
                         AlarmClockActivity.updateActivity(context);
                     } else {
-                        Alarm.startAlarm(context, lessons.getJSONObject(0), information.getDelay());
+                        Alarm.startAlarm(context, lessons.getJSONObject(0), information);
                     }
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
@@ -131,10 +134,6 @@ public class Request {
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                Information information = FileManager.readInfo(context);
-                information.setLessons(new JSONArray().put(context.getString(R.string.failed_timetable_request_message)));
-                FileManager.writeInfo(context, information);
-
                 AlarmNotification.sendNotification(context, context.getString(R.string.failed_timetable_request_message), null);
                 AlarmClockActivity.updateActivity(context);
             }

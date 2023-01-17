@@ -15,6 +15,9 @@ public class SessionManager {
     private static final String KEY_LOCALE = "locale";
     private static final String KEY_LAST_ACTIVITY = "last_activity";
 
+    private static final String DEFAULT_LOCALE = "en";
+    private static final String DEFAULT_ACTIVITY = "MainActivity";
+
     public SessionManager(Context context) {
         sharedPreferences = context.getSharedPreferences(context.getString(R.string.app_name), Context.MODE_PRIVATE);
     }
@@ -38,7 +41,7 @@ public class SessionManager {
     }
 
     public String fetchLocale() {
-        return sharedPreferences.getString(KEY_LOCALE, "en");
+        return sharedPreferences.getString(KEY_LOCALE, DEFAULT_LOCALE);
     }
 
     public void saveLastActivity(String locale) {
@@ -48,6 +51,6 @@ public class SessionManager {
     }
 
     public String fetchLastActivity() {
-        return sharedPreferences.getString(KEY_LAST_ACTIVITY, "MainActivity");
+        return sharedPreferences.getString(KEY_LAST_ACTIVITY, DEFAULT_ACTIVITY);
     }
 }

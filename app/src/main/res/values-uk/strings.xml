@@ -6,7 +6,7 @@
     <string name="select_time">Час</string>
     <string name="label_alarm">Час встановлення</string>
     <string name="label_group">Група</string>
-    <string name="label_delay">Затримка</string>
+    <string name="label_activation">Активація</string>
     <string name="permission_message">Ви повинні надати NureAlarm дозвіл на відображення поверх інших програм.</string>
     <string name="select_group">Оберіть групу</string>
     <string name="select_lesson">Оберіть заняття</string>
@@ -19,21 +19,21 @@
     <string name="failed_groups_request_message">Не вдалося отримати список груп. Можливо, у вас погане інтернет-зʼєднання або cist.nure.ua не відповідає.</string>
     <string name="not_specified_information_message">Для запуску програми необхідно вказати групу.</string>
     <string name="failed_timetable_request_message">Не вдалося отримати список занять. Можливо, у вас погане інтернет-з’єднання або cist.nure.ua не відповідає.</string>
-    <string name="lessons_message">Встановлено на %s заняття - %s</string>
+    <string name="lessons_message">Встановлено на %d заняття - %s</string>
     <string name="no_lessons">Немає занять!</string>
     <string name="lesson_number">Заняття #</string>
-    <string-array name="delay">
-        <item>Без затримки</item>
-        <item>10 хвилин</item>
-        <item>30 хвилин</item>
-        <item>1 година</item>
-        <item>2 години</item>
+    <string-array name="activation">
+        <item>Відразу</item>
+        <item>За 10 хвилин</item>
+        <item>За 30 хвилин</item>
+        <item>За 1 годину</item>
+        <item>За 2 години</item>
     </string-array>
     <string name="locale">Локаль</string>
-    <string name="help_message"><b>Час встановлення</b> - ви обираєте час, в який буде встановлено будильник. Наприклад: якщо встановлено 20:00, то кожен день о 20:00 будильник буде встановлюватися на перше заняття і ви будете отримувати сповіщення.\n\n<b>Група</b> - ви обираєте групу, в якій навчаєтесь.\n\n<b>Затримка</b> - ви обираєте, за скільки хвилин/годин до заняття спрацює будильник. Наприклад: якщо встановлено 30 хвилин і заняття починається об 11:15, будильник буде встановлено на 10:45.\n\n</string>
+    <string name="help_message"><b>Час встановлення</b> - час, в який буде встановлено будильник. Наприклад: якщо встановлено 20:00, то кожен день о 20:00 будильник буде встановлюватися на перше заняття і ви будете отримувати сповіщення.\n\n<b>Група</b> - група, в якій ви навчаєтесь.\n\n<b>Активація</b> - за скільки хвилин/годин до заняття спрацює будильник. Наприклад: якщо встановлено 30 хвилин і заняття починається об 11:15, будильник буде встановлено на 10:45.\n\n</string>
     <string name="settings">Налаштування</string>
     <string name="no_alarm">Немає\nбудильника</string>
-    <string name="confirmation_message">Ви бажаєте видалити встановлений будильник?</string>
+    <string name="deletion_confirmation_message">Ви бажаєте видалити встановлений будильник?</string>
     <string name="yes">так</string>
     <string name="no">ні</string>
     <string name="confirmation_dialog">Підтвердження</string>
