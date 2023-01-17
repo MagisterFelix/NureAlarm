@@ -36,7 +36,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                     Alarm.cancelAlarm(context);
                 }
                 if (action.equals(ACTION_RETRY)) {
-                    AlarmWorkerReceiver.startWork(context);
+                    AlarmWorkerReceiver.startWork(context, false);
                 }
 
                 AlarmClockActivity.updateActivity(context);

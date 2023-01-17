@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import androidx.work.Constraints;
+import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
@@ -16,11 +17,14 @@ public class AlarmWorkerReceiver extends BroadcastReceiver {
     private static final Constraints NETWORK_CONNECTED = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
     private static final String ALARM_WORK_TAG = "AlarmWork";
 
-    public static void startWork(Context context) {
+    public static final String UPCOMING_LESSON_KEY = "upcoming_lesson";
+
+    public static void startWork(Context context, boolean setUpcomingLesson) {
         OneTimeWorkRequest request = new OneTimeWorkRequest
                 .Builder(ALARM_WORKER_CLASS)
                 .setConstraints(NETWORK_CONNECTED)
                 .addTag(ALARM_WORK_TAG)
+                .setInputData(new Data.Builder().putBoolean(UPCOMING_LESSON_KEY, setUpcomingLesson).build())
                 .build();
 
         WorkManager.getInstance(context).enqueueUniqueWork(ALARM_WORK_TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, request);
@@ -32,6 +36,6 @@ public class AlarmWorkerReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        startWork(context);
+        startWork(context, false);
     }
 }

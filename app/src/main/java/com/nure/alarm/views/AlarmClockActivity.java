@@ -37,6 +37,7 @@ import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.network.NetworkInfo;
 import com.nure.alarm.core.notification.AlarmNotificationReceiver;
 import com.nure.alarm.core.utils.ActivityUtils;
+import com.nure.alarm.core.utils.GeneralUtils;
 import com.nure.alarm.core.work.AlarmWorkerReceiver;
 import com.nure.alarm.views.dialogs.DeletionConfirmationDialog;
 import com.nure.alarm.views.dialogs.NotSpecifiedInformationDialog;
@@ -93,18 +94,12 @@ public class AlarmClockActivity extends AppCompatActivity {
                 TextView time_left = findViewById(R.id.alarm_time_left);
 
                 Calendar now = Calendar.getInstance();
-                Time time = new Time(information.getAlarm().getString("time"));
-
-                Calendar date = Calendar.getInstance();
-                date.set(Calendar.HOUR_OF_DAY, time.getHour());
-                date.set(Calendar.MINUTE, time.getMinute());
-                date.set(Calendar.SECOND, 0);
-
-                if (date.before(now)) {
-                    date.add(Calendar.DATE, 1);
+                Calendar alarmTime = GeneralUtils.getSpecificDateTime(new Time(information.getAlarm().getString("time")));
+                if (alarmTime.before(now)) {
+                    alarmTime.add(Calendar.DATE, 1);
                 }
 
-                new CountDownTimer(date.getTimeInMillis() - now.getTimeInMillis(),1000) {
+                new CountDownTimer(alarmTime.getTimeInMillis() - now.getTimeInMillis(),1000) {
 
                     @Override
                     public void onTick(long millis) {
@@ -179,7 +174,7 @@ public class AlarmClockActivity extends AppCompatActivity {
                 }
 
                 if (NetworkInfo.isNetworkAvailable(getApplication())) {
-                    AlarmWorkerReceiver.startWork(getApplicationContext());
+                    AlarmWorkerReceiver.startWork(getApplicationContext(), true);
 
                     ProgressBar progressBar = new ProgressBar(getApplicationContext());
                     progressBar.setScaleX(0.6f);
@@ -254,6 +249,26 @@ public class AlarmClockActivity extends AppCompatActivity {
             ListView listView = dialog.findViewById(R.id.lesson_list_view);
 
             JSONArray lessons = FileManager.readInfo(getApplicationContext()).getLessons();
+            try {
+                Calendar now = Calendar.getInstance();
+
+                for (int i = 0; i < lessons.length(); ++i) {
+                    JSONObject lesson = lessons.getJSONObject(i);
+                    Calendar lessonTime = GeneralUtils.getSpecificDateTime(new Time(lesson.getString("time")));
+
+                    if (now.before(lessonTime)) {
+                        information.setLessons(lessons);
+                        FileManager.writeInfo(context, information);
+                        break;
+                    }
+
+                    lessons.remove(i);
+                    --i;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
             ArrayList<Spanned> formatted_lessons = new ArrayList<>();
             for (int i = 0; i < lessons.length(); ++i) {
                 try {

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.gson.Gson;
@@ -18,7 +19,9 @@ import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
 import com.nure.alarm.core.models.DateRange;
 import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.notification.AlarmNotification;
+import com.nure.alarm.core.utils.GeneralUtils;
 import com.nure.alarm.views.AlarmClockActivity;
 import com.nure.alarm.views.MainActivity;
 import com.nure.alarm.views.dialogs.FailedGroupsRequestDialog;
@@ -92,7 +95,7 @@ public class Request {
         });
     }
 
-    public void getTimeTable(DateRange dateRange, long group_id) {
+    public void getTimeTable(DateRange dateRange, long group_id, @Nullable DateRange additionalDateRange) {
         String unformatted_query = "778:201::::201:P201_FIRST_DATE,P201_LAST_DATE,P201_GROUP,P201_POTOK:%s,%d,0:";
         String query = String.format(Locale.getDefault(), unformatted_query, dateRange.getRange(), group_id);
 
@@ -125,7 +128,31 @@ public class Request {
                         AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), false);
                         AlarmClockActivity.updateActivity(context);
                     } else {
-                        Alarm.startAlarm(context, lessons.getJSONObject(0), information);
+                        Calendar now = Calendar.getInstance();
+
+                        if (additionalDateRange == null) {
+                            Alarm.startAlarm(context, lessons.getJSONObject(0), information);
+                        } else {
+                            for (int i = 0; i < lessons.length(); ++i) {
+                                JSONObject lesson = lessons.getJSONObject(i);
+                                Calendar lessonTime = GeneralUtils.getSpecificDateTime(new Time(lesson.getString("time")));
+
+                                if (now.before(lessonTime)) {
+                                    information.setLessons(lessons);
+                                    FileManager.writeInfo(context, information);
+
+                                    Alarm.startAlarm(context, lesson, information);
+                                    break;
+                                }
+
+                                lessons.remove(i);
+                                --i;
+                            }
+
+                            if (FileManager.readInfo(context).getAlarm().length() == 0) {
+                                getTimeTable(additionalDateRange, group_id, null);
+                            }
+                        }
                     }
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();

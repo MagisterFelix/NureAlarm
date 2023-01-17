@@ -25,18 +25,36 @@ public class AlarmWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Calendar date = Calendar.getInstance();
+        boolean setUpcomingLesson = getInputData().getBoolean(AlarmWorkerReceiver.UPCOMING_LESSON_KEY, false);
 
-        if (date.get(Calendar.HOUR_OF_DAY) > 6) {
-            date.add(Calendar.DATE, 1);
+        Calendar dateTime = Calendar.getInstance();
+
+        if (!setUpcomingLesson && dateTime.get(Calendar.HOUR_OF_DAY) > 6) {
+            dateTime.add(Calendar.DATE, 1);
         }
+
+        Calendar additionalDateTime= Calendar.getInstance();
+        additionalDateTime.add(Calendar.DATE, 1);
 
         Information information = FileManager.readInfo(getApplicationContext());
 
         if (information.getAlarm().length() == 0) {
             try {
                 Request request = new Request(getApplicationContext());
-                request.getTimeTable(new DateRange(date, date), information.getGroup().getLong("id"));
+
+                if (setUpcomingLesson) {
+                    request.getTimeTable(
+                            new DateRange(dateTime, dateTime),
+                            information.getGroup().getLong("id"),
+                            new DateRange(additionalDateTime, additionalDateTime)
+                    );
+                } else {
+                    request.getTimeTable(
+                            new DateRange(dateTime, dateTime),
+                            information.getGroup().getLong("id"),
+                            null
+                    );
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }

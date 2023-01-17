@@ -12,6 +12,7 @@ import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.notification.AlarmNotification;
+import com.nure.alarm.core.utils.GeneralUtils;
 import com.nure.alarm.core.work.AlarmWorkManager;
 import com.nure.alarm.views.AlarmClockActivity;
 import com.nure.alarm.views.MainActivity;
@@ -25,8 +26,6 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class Alarm {
-
-    private static final int MILLISECONDS_IN_MINUTE = 60000;
 
     public static void setAlarm(Context context, long time) {
         PendingIntent mainActivity = PendingIntent.getActivity(context, 0,
@@ -57,12 +56,7 @@ public class Alarm {
 
     public static void enableAlarmWork(Context context, Information information) {
         Calendar now = Calendar.getInstance();
-
-        Calendar notificationTime = Calendar.getInstance();
-        notificationTime.set(Calendar.HOUR_OF_DAY, information.getSettingTime().getHour());
-        notificationTime.set(Calendar.MINUTE, information.getSettingTime().getMinute());
-        notificationTime.set(Calendar.SECOND, 0);
-
+        Calendar notificationTime = GeneralUtils.getSpecificDateTime(information.getSettingTime());
         if (notificationTime.before(now) || notificationTime.equals(now)) {
             notificationTime.add(Calendar.DATE, 1);
         }
@@ -82,17 +76,13 @@ public class Alarm {
     public static void startAlarm(Context context, JSONObject lesson, Information information) {
         try {
             Calendar now = Calendar.getInstance();
-
-            Time time = new Time(lesson.getString("time"));
-
-            Calendar date = Calendar.getInstance();
-            date.set(Calendar.HOUR_OF_DAY, time.getHour());
-            date.set(Calendar.MINUTE, time.getMinute());
-            date.set(Calendar.SECOND, 0);
-            date.add(Calendar.MILLISECOND, -(information.getActivation() * MILLISECONDS_IN_MINUTE));
-
-            if (date.before(now)) {
-                date.add(Calendar.DATE, 1);
+            Calendar lessonTime = GeneralUtils.getSpecificDateTime(new Time(lesson.getString("time")));
+            if (lessonTime.before(now)) {
+                lessonTime.add(Calendar.DATE, 1);
+            }
+            lessonTime.add(Calendar.MILLISECOND, -(information.getActivation() * GeneralUtils.MILLISECONDS_IN_MINUTE));
+            if (lessonTime.before(now)) {
+                lessonTime.add(Calendar.MILLISECOND, information.getActivation() * GeneralUtils.MILLISECONDS_IN_MINUTE);
             }
 
             String unformatted_message = context.getString(R.string.lessons_message);
@@ -100,7 +90,7 @@ public class Alarm {
                     Locale.getDefault(),
                     unformatted_message, lesson.getInt("number"), lesson.getString("name")
             );
-            String formatted_time = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(date.getTime());
+            String formatted_time = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(lessonTime.getTime());
 
             JSONObject alarm = new JSONObject();
             alarm.put("time", formatted_time);
@@ -110,7 +100,7 @@ public class Alarm {
             information.setAlarm(alarm);
             FileManager.writeInfo(context, information);
 
-            Alarm.setAlarm(context, date.getTimeInMillis());
+            Alarm.setAlarm(context, lessonTime.getTimeInMillis());
             AlarmNotification.sendNotification(context, message, true);
         } catch (JSONException e) {
             e.printStackTrace();
