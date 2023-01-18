@@ -33,7 +33,7 @@ public class AlarmWorker extends Worker {
             dateTime.add(Calendar.DATE, 1);
         }
 
-        Calendar additionalDateTime= Calendar.getInstance();
+        Calendar additionalDateTime = Calendar.getInstance();
         additionalDateTime.add(Calendar.DATE, 1);
 
         Information information = FileManager.readInfo(getApplicationContext());

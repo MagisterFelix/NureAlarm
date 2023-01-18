@@ -128,11 +128,11 @@ public class Request {
                         AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), false);
                         AlarmClockActivity.updateActivity(context);
                     } else {
-                        Calendar now = Calendar.getInstance();
-
                         if (additionalDateRange == null) {
                             Alarm.startAlarm(context, lessons.getJSONObject(0), information);
                         } else {
+                            Calendar now = Calendar.getInstance();
+
                             for (int i = 0; i < lessons.length(); ++i) {
                                 JSONObject lesson = lessons.getJSONObject(i);
                                 Calendar lessonTime = GeneralUtils.getSpecificDateTime(new Time(lesson.getString("time")));
