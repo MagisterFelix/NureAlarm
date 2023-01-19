@@ -5,7 +5,6 @@ import android.content.Context;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.gson.Gson;
@@ -19,11 +18,11 @@ import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
 import com.nure.alarm.core.models.DateRange;
 import com.nure.alarm.core.models.Information;
-import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.notification.AlarmNotification;
-import com.nure.alarm.core.utils.GeneralUtils;
+import com.nure.alarm.core.utils.JSONUtils;
 import com.nure.alarm.views.AlarmClockActivity;
 import com.nure.alarm.views.MainActivity;
+import com.nure.alarm.views.dialogs.EmptyListOfElementsDialog;
 import com.nure.alarm.views.dialogs.FailedGroupsRequestDialog;
 import com.nure.alarm.views.dialogs.ReceivingGroupsDialog;
 
@@ -76,7 +75,12 @@ public class Request {
 
                 try {
                     receivingGroupsDialog.dismiss();
-                    MainActivity.showGroups(activity, context, groupTextView);
+                    if (FileManager.readGroups(context).size() != 0) {
+                        MainActivity.showGroups(activity, context, groupTextView);
+                    } else {
+                        EmptyListOfElementsDialog emptyListOfElementsDialog = new EmptyListOfElementsDialog();
+                        emptyListOfElementsDialog.show(fragmentManager, EmptyListOfElementsDialog.class.getSimpleName());
+                    }
                 } catch (IllegalStateException e) {
                     e.printStackTrace();
                 }
@@ -124,35 +128,19 @@ public class Request {
                     information.setLessons(lessons);
                     FileManager.writeInfo(context, information);
 
-                    if (lessons.length() == 0) {
+                    new SessionManager(context).saveLessonsDate(dateRange.getFromDate());
+
+                    if (dateRange.isToday()) {
+                        JSONUtils.filterLessonsByCurrentTime(context);
+                    }
+
+                    lessons = FileManager.readInfo(context).getLessons();
+
+                    if (lessons.length() != 0) {
+                        Alarm.startAlarm(context, lessons.getJSONObject(0), information);
+                    } else {
                         AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), false);
                         AlarmClockActivity.updateActivity(context);
-                    } else {
-                        if (additionalDateRange == null) {
-                            Alarm.startAlarm(context, lessons.getJSONObject(0), information);
-                        } else {
-                            Calendar now = Calendar.getInstance();
-
-                            for (int i = 0; i < lessons.length(); ++i) {
-                                JSONObject lesson = lessons.getJSONObject(i);
-                                Calendar lessonTime = GeneralUtils.getSpecificDateTime(new Time(lesson.getString("time")));
-
-                                if (now.before(lessonTime)) {
-                                    information.setLessons(lessons);
-                                    FileManager.writeInfo(context, information);
-
-                                    Alarm.startAlarm(context, lesson, information);
-                                    break;
-                                }
-
-                                lessons.remove(i);
-                                --i;
-                            }
-
-                            if (FileManager.readInfo(context).getAlarm().length() == 0) {
-                                getTimeTable(additionalDateRange, group_id, null);
-                            }
-                        }
                     }
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();

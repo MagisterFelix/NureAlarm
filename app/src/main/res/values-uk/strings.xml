@@ -11,6 +11,9 @@
     <string name="select_group">Оберіть групу</string>
     <string name="select_lesson">Оберіть заняття</string>
     <string name="change_lesson">Змінити заняття</string>
+    <string name="select_option">Оберіть опцію</string>
+    <string name="option_today_nearest">Наступне заняття поточного дня</string>
+    <string name="option_tomorrow_first">Перше заняття наступного дня</string>
     <string name="dismiss">Відхилити</string>
     <string name="remove">Видалити</string>
     <string name="search">Пошук…</string>
@@ -18,6 +21,7 @@
     <string name="unavailable_network_message">Для використання NureAlarm потрібне стабільне підключення до Інтернету. Підключіться до Wi-Fi або увімкніть мобільну мережу.</string>
     <string name="failed_groups_request_message">Не вдалося отримати список груп. Можливо, у вас погане інтернет-зʼєднання або cist.nure.ua не відповідає.</string>
     <string name="not_specified_information_message">Для запуску програми необхідно вказати групу.</string>
+    <string name="empty_list_of_elements_message">Список, який ви намагаєтесь отримати, не має жодного елемента.</string>
     <string name="failed_timetable_request_message">Не вдалося отримати список занять. Можливо, у вас погане інтернет-з’єднання або cist.nure.ua не відповідає.</string>
     <string name="lessons_message">Встановлено на %d заняття - %s</string>
     <string name="no_lessons">Немає занять!</string>
@@ -41,6 +45,7 @@
     <string name="failed_groups_request_dialog">Помилка запиту груп</string>
     <string name="help_dialog">Допомога</string>
     <string name="not_specified_information_dialog">Не вказана інформація</string>
+    <string name="empty_list_of_elements_dialog">Пустий список елементів</string>
     <string name="receiving_groups_dialog">Отримання груп</string>
     <string name="unavailable_network_dialog">Недоступна мережа</string>
     <string name="ok">ОК</string>

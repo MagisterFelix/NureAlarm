@@ -9,10 +9,12 @@ import androidx.fragment.app.FragmentManager;
 
 import com.nure.alarm.R;
 import com.nure.alarm.core.managers.FileManager;
+import com.nure.alarm.core.managers.SessionManager;
+import com.nure.alarm.core.models.DateRange;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.notification.AlarmNotification;
-import com.nure.alarm.core.utils.GeneralUtils;
+import com.nure.alarm.core.utils.DateTimeUtils;
 import com.nure.alarm.core.work.AlarmWorkManager;
 import com.nure.alarm.views.AlarmClockActivity;
 import com.nure.alarm.views.MainActivity;
@@ -56,7 +58,8 @@ public class Alarm {
 
     public static void enableAlarmWork(Context context, Information information) {
         Calendar now = Calendar.getInstance();
-        Calendar notificationTime = GeneralUtils.getSpecificDateTime(information.getSettingTime());
+
+        Calendar notificationTime = DateTimeUtils.getSpecificDateTime(information.getSettingTime());
         if (notificationTime.before(now) || notificationTime.equals(now)) {
             notificationTime.add(Calendar.DATE, 1);
         }
@@ -76,13 +79,15 @@ public class Alarm {
     public static void startAlarm(Context context, JSONObject lesson, Information information) {
         try {
             Calendar now = Calendar.getInstance();
-            Calendar lessonTime = GeneralUtils.getSpecificDateTime(new Time(lesson.getString("time")));
-            if (lessonTime.before(now)) {
+
+            Calendar lessonTime = DateTimeUtils.getSpecificDateTime(new Time(lesson.getString("time")));
+            if (!new DateRange(new SessionManager(context).fetchLessonsDate()).isToday()) {
                 lessonTime.add(Calendar.DATE, 1);
-            }
-            lessonTime.add(Calendar.MILLISECOND, -(information.getActivation() * GeneralUtils.MILLISECONDS_IN_MINUTE));
-            if (lessonTime.before(now)) {
-                lessonTime.add(Calendar.MILLISECOND, information.getActivation() * GeneralUtils.MILLISECONDS_IN_MINUTE);
+                lessonTime.add(Calendar.MILLISECOND, -(information.getActivation() * DateTimeUtils.MILLISECONDS_IN_MINUTE));
+            } else {
+                if (now.before(DateTimeUtils.getSpecificDateTime(new Time(5, 45)))) {
+                    lessonTime.add(Calendar.MILLISECOND, -(information.getActivation() * DateTimeUtils.MILLISECONDS_IN_MINUTE));
+                }
             }
 
             String unformatted_message = context.getString(R.string.lessons_message);

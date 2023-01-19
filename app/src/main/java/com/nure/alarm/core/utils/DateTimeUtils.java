@@ -4,7 +4,7 @@ import com.nure.alarm.core.models.Time;
 
 import java.util.Calendar;
 
-public class GeneralUtils {
+public class DateTimeUtils {
 
     public static final int MILLISECONDS_IN_MINUTE = 60000;
 

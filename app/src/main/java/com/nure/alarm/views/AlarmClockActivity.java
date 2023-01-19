@@ -32,12 +32,15 @@ import com.nure.alarm.core.Alarm;
 import com.nure.alarm.core.managers.ContextManager;
 import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
+import com.nure.alarm.core.models.DateRange;
 import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.models.LessonsType;
 import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.network.NetworkInfo;
 import com.nure.alarm.core.notification.AlarmNotificationReceiver;
 import com.nure.alarm.core.utils.ActivityUtils;
-import com.nure.alarm.core.utils.GeneralUtils;
+import com.nure.alarm.core.utils.DateTimeUtils;
+import com.nure.alarm.core.utils.JSONUtils;
 import com.nure.alarm.core.work.AlarmWorkerReceiver;
 import com.nure.alarm.views.dialogs.DeletionConfirmationDialog;
 import com.nure.alarm.views.dialogs.NotSpecifiedInformationDialog;
@@ -49,6 +52,7 @@ import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -94,8 +98,9 @@ public class AlarmClockActivity extends AppCompatActivity {
                 TextView time_left = findViewById(R.id.alarm_time_left);
 
                 Calendar now = Calendar.getInstance();
-                Calendar alarmTime = GeneralUtils.getSpecificDateTime(new Time(information.getAlarm().getString("time")));
-                if (alarmTime.before(now)) {
+
+                Calendar alarmTime = DateTimeUtils.getSpecificDateTime(new Time(information.getAlarm().getString("time")));
+                if (!new DateRange(sessionManager.fetchLessonsDate()).isToday()) {
                     alarmTime.add(Calendar.DATE, 1);
                 }
 
@@ -103,8 +108,8 @@ public class AlarmClockActivity extends AppCompatActivity {
 
                     @Override
                     public void onTick(long millis) {
-                        int hours   = (int) ((millis / (1000 * 60 * 60)) % 24);
-                        int minutes = (int) ((millis / (1000 * 60)) % 60);
+                        int hours   = (int) ((millis / (DateTimeUtils.MILLISECONDS_IN_MINUTE * 60)));
+                        int minutes = (int) ((millis / DateTimeUtils.MILLISECONDS_IN_MINUTE) % 60);
 
                         String text = String.format(
                                 Locale.getDefault(),
@@ -169,24 +174,15 @@ public class AlarmClockActivity extends AppCompatActivity {
                 if (information.getGroup().length() == 0) {
                     NotSpecifiedInformationDialog notSpecifiedInformationDialog = new NotSpecifiedInformationDialog();
                     notSpecifiedInformationDialog.show(getSupportFragmentManager(), NotSpecifiedInformationDialog.class.getSimpleName());
-
                     return false;
                 }
 
                 if (NetworkInfo.isNetworkAvailable(getApplication())) {
-                    AlarmWorkerReceiver.startWork(getApplicationContext(), true);
-
-                    ProgressBar progressBar = new ProgressBar(getApplicationContext());
-                    progressBar.setScaleX(0.6f);
-                    progressBar.setScaleY(0.6f);
-                    progressBar.setIndeterminateTintList(ColorStateList.valueOf(Color.WHITE));
-                    menuItem.setActionView(progressBar);
-
+                    chooseOption(menuItem);
                     return true;
                 } else {
                     UnavailableNetworkDialog unavailableNetworkDialog = new UnavailableNetworkDialog();
                     unavailableNetworkDialog.show(getSupportFragmentManager(), UnavailableNetworkDialog.class.getSimpleName());
-
                     return false;
                 }
             });
@@ -229,6 +225,40 @@ public class AlarmClockActivity extends AppCompatActivity {
         ActivityUtils.startActivity(AlarmClockActivity.this, mainActivity);
     }
 
+    private void chooseOption(MenuItem menuItem) {
+        TextView alarmOptionsTextView = findViewById(R.id.alarm_options);
+        alarmOptionsTextView.setOnClickListener(v -> {
+            Dialog dialog = new Dialog(AlarmClockActivity.this);
+            dialog.setContentView(R.layout.alarm_options_spinner);
+
+            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.9);
+            int height = WindowManager.LayoutParams.WRAP_CONTENT;
+
+            dialog.getWindow().setLayout(width, height);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
+
+            ListView listView = dialog.findViewById(R.id.alarm_options_list_view);
+
+            ArrayList<String> options = new ArrayList<>(Arrays.asList(getString(R.string.option_today_nearest), getString(R.string.option_tomorrow_first)));
+            ArrayAdapter<String> optionsAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, options);
+
+            listView.setAdapter(optionsAdapter);
+            listView.setOnItemClickListener((parent, view, position, id) -> {
+                AlarmWorkerReceiver.startWork(getApplicationContext(), position == 0 ? LessonsType.TODAY_NEAREST : LessonsType.TOMORROW_FIRST);
+
+                ProgressBar progressBar = new ProgressBar(getApplicationContext());
+                progressBar.setScaleX(0.6f);
+                progressBar.setScaleY(0.6f);
+                progressBar.setIndeterminateTintList(ColorStateList.valueOf(Color.WHITE));
+                menuItem.setActionView(progressBar);
+
+                dialog.dismiss();
+            });
+        });
+        alarmOptionsTextView.performClick();
+    }
+
     private void changeLesson() {
         collapsePanel(getApplicationContext());
 
@@ -248,28 +278,12 @@ public class AlarmClockActivity extends AppCompatActivity {
 
             ListView listView = dialog.findViewById(R.id.lesson_list_view);
 
-            JSONArray lessons = FileManager.readInfo(getApplicationContext()).getLessons();
-            try {
-                Calendar now = Calendar.getInstance();
-
-                for (int i = 0; i < lessons.length(); ++i) {
-                    JSONObject lesson = lessons.getJSONObject(i);
-                    Calendar lessonTime = GeneralUtils.getSpecificDateTime(new Time(lesson.getString("time")));
-
-                    if (now.before(lessonTime)) {
-                        information.setLessons(lessons);
-                        FileManager.writeInfo(context, information);
-                        break;
-                    }
-
-                    lessons.remove(i);
-                    --i;
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            if (new DateRange(sessionManager.fetchLessonsDate()).isToday()) {
+                JSONUtils.filterLessonsByCurrentTime(getApplicationContext());
             }
-
+            JSONArray lessons = FileManager.readInfo(getApplicationContext()).getLessons();
             ArrayList<Spanned> formatted_lessons = new ArrayList<>();
+
             for (int i = 0; i < lessons.length(); ++i) {
                 try {
                     JSONObject jsonObject = lessons.getJSONObject(i);
@@ -285,6 +299,7 @@ public class AlarmClockActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
+
             ArrayAdapter<Spanned> groupAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, formatted_lessons);
 
             listView.setAdapter(groupAdapter);

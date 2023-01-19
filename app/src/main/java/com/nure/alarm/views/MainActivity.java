@@ -38,6 +38,7 @@ import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.network.NetworkInfo;
 import com.nure.alarm.core.updater.Updater;
 import com.nure.alarm.core.utils.ActivityUtils;
+import com.nure.alarm.views.dialogs.EmptyListOfElementsDialog;
 import com.nure.alarm.views.dialogs.HelpDialog;
 import com.nure.alarm.views.dialogs.NotSpecifiedInformationDialog;
 import com.nure.alarm.views.dialogs.UnavailableNetworkDialog;
@@ -127,7 +128,12 @@ public class MainActivity extends AppCompatActivity {
                     Request request = new Request(getApplicationContext());
                     request.getGroups(this, getSupportFragmentManager(), groupTextView);
                 } else {
-                    showGroups(this, ContextManager.getLocaleContext(getApplicationContext()), groupTextView);
+                    if (FileManager.readGroups(ContextManager.getLocaleContext(getApplicationContext())).size() != 0) {
+                        showGroups(this, ContextManager.getLocaleContext(getApplicationContext()), groupTextView);
+                    } else {
+                        EmptyListOfElementsDialog emptyListOfElementsDialog = new EmptyListOfElementsDialog();
+                        emptyListOfElementsDialog.show(getSupportFragmentManager(), EmptyListOfElementsDialog.class.getSimpleName());
+                    }
                 }
             } else {
                 UnavailableNetworkDialog unavailableNetworkDialog = new UnavailableNetworkDialog();
@@ -246,12 +252,13 @@ public class MainActivity extends AppCompatActivity {
 
     public static void showGroups(Activity activity, Context context, TextView groupTextView) {
         HashMap<String, Integer> groups = FileManager.readGroups(context);
+        double kf = groups.size() > 7 ? 0.7 : (double) (groups.size() - 1) / 10;
 
         Dialog dialog = new Dialog(activity);
         dialog.setContentView(R.layout.group_spinner);
 
         int width = (int) (context.getResources().getDisplayMetrics().widthPixels * 0.9);
-        int height = (int) (context.getResources().getDisplayMetrics().heightPixels * 0.8);
+        int height = (int) (context.getResources().getDisplayMetrics().heightPixels * kf);
 
         dialog.getWindow().setLayout(width, height);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));

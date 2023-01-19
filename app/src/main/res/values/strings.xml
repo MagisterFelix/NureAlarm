@@ -11,6 +11,9 @@
     <string name="select_group">Select group</string>
     <string name="select_lesson">Select lesson</string>
     <string name="change_lesson">Change lesson</string>
+    <string name="select_option">Select option</string>
+    <string name="option_today_nearest">The next today\'s lesson</string>
+    <string name="option_tomorrow_first">The first lesson of tomorrow</string>
     <string name="dismiss">Dismiss</string>
     <string name="remove">Remove</string>
     <string name="search">Search…</string>
@@ -18,6 +21,7 @@
     <string name="unavailable_network_message">In order to use NureAlarm you need a stable internet connection. Please connect to Wi-Fi or turn on the mobile network.</string>
     <string name="failed_groups_request_message">Failed to get list of groups. You may have a poor internet connection or the cist.nure.ua is not responding.</string>
     <string name="not_specified_information_message">To start the application, you must specify the group.</string>
+    <string name="empty_list_of_elements_message">A list that you are trying to get does not have a single element.</string>
     <string name="failed_timetable_request_message">Failed to get list of lessons. You may have a poor internet connection or the cist.nure.ua is not responding.</string>
     <string name="lessons_message">Set for %d lesson - %s</string>
     <string name="no_lessons">No lessons!</string>
@@ -41,6 +45,7 @@
     <string name="failed_groups_request_dialog">Groups request failed</string>
     <string name="help_dialog">Help</string>
     <string name="not_specified_information_dialog">Information not specified</string>
+    <string name="empty_list_of_elements_dialog">Empty list of elements</string>
     <string name="receiving_groups_dialog">Getting groups</string>
     <string name="unavailable_network_dialog">Unavailable network</string>
     <string name="ok">OK</string>

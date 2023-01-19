@@ -11,6 +11,9 @@ import com.nure.alarm.core.api.Request;
 import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.models.DateRange;
 import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.models.LessonsType;
+import com.nure.alarm.core.models.Time;
+import com.nure.alarm.core.utils.DateTimeUtils;
 
 import org.json.JSONException;
 
@@ -25,36 +28,20 @@ public class AlarmWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        boolean setUpcomingLesson = getInputData().getBoolean(AlarmWorkerReceiver.UPCOMING_LESSON_KEY, false);
+        int lessonsType = getInputData().getInt(AlarmWorkerReceiver.LESSONS_TYPE_KEY, LessonsType.AUTO);
 
         Calendar dateTime = Calendar.getInstance();
-
-        if (!setUpcomingLesson && dateTime.get(Calendar.HOUR_OF_DAY) > 6) {
+        if ((lessonsType == LessonsType.AUTO && dateTime.after(DateTimeUtils.getSpecificDateTime(new Time(7, 44)))) ||
+                (lessonsType == LessonsType.TOMORROW_FIRST)) {
             dateTime.add(Calendar.DATE, 1);
         }
-
-        Calendar additionalDateTime = Calendar.getInstance();
-        additionalDateTime.add(Calendar.DATE, 1);
 
         Information information = FileManager.readInfo(getApplicationContext());
 
         if (information.getAlarm().length() == 0) {
             try {
                 Request request = new Request(getApplicationContext());
-
-                if (setUpcomingLesson) {
-                    request.getTimeTable(
-                            new DateRange(dateTime, dateTime),
-                            information.getGroup().getLong("id"),
-                            new DateRange(additionalDateTime, additionalDateTime)
-                    );
-                } else {
-                    request.getTimeTable(
-                            new DateRange(dateTime, dateTime),
-                            information.getGroup().getLong("id"),
-                            null
-                    );
-                }
+                request.getTimeTable(new DateRange(dateTime), information.getGroup().getLong("id"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }

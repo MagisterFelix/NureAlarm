@@ -7,6 +7,7 @@ import android.content.Intent;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.nure.alarm.core.Alarm;
+import com.nure.alarm.core.models.LessonsType;
 import com.nure.alarm.core.work.AlarmWorkerReceiver;
 import com.nure.alarm.views.AlarmClockActivity;
 
@@ -36,7 +37,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                     Alarm.cancelAlarm(context);
                 }
                 if (action.equals(ACTION_RETRY)) {
-                    AlarmWorkerReceiver.startWork(context, false);
+                    AlarmWorkerReceiver.startWork(context, LessonsType.AUTO);
                 }
 
                 AlarmClockActivity.updateActivity(context);
