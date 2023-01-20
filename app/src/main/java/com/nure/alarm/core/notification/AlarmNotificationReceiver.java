@@ -24,11 +24,13 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
 
         if (action.equals(ACTION_DISMISS)) {
             Alarm.stopAlarm(context);
+            AlarmClockActivity.updateActivity(context);
         } else {
             NotificationManagerCompat.from(context).cancel(AlarmNotification.NOTIFICATION_ID);
 
             if (action.equals(ACTION_CHANGE)) {
                 Intent alarmClockActivity = new Intent(context, AlarmClockActivity.class);
+                alarmClockActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 alarmClockActivity.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 alarmClockActivity.setAction(action);
                 context.startActivity(alarmClockActivity);
@@ -37,7 +39,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                     Alarm.cancelAlarm(context);
                 }
                 if (action.equals(ACTION_RETRY)) {
-                    AlarmWorkerReceiver.startWork(context, LessonsType.AUTO);
+                    AlarmWorkerReceiver.startWork(context, intent.getIntExtra(LessonsType.class.getSimpleName(), LessonsType.AUTO));
                 }
 
                 AlarmClockActivity.updateActivity(context);

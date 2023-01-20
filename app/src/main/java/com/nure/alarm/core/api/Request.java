@@ -99,9 +99,9 @@ public class Request {
         });
     }
 
-    public void getTimeTable(DateRange dateRange, long group_id, @Nullable DateRange additionalDateRange) {
-        String unformatted_query = "778:201::::201:P201_FIRST_DATE,P201_LAST_DATE,P201_GROUP,P201_POTOK:%s,%d,0:";
-        String query = String.format(Locale.getDefault(), unformatted_query, dateRange.getRange(), group_id);
+    public void getTimeTable(DateRange dateRange, long group_id, int lessonsType) {
+        String unformattedQuery = "778:201::::201:P201_FIRST_DATE,P201_LAST_DATE,P201_GROUP,P201_POTOK:%s,%d,0:";
+        String query = String.format(Locale.getDefault(), unformattedQuery, dateRange.getRange(), group_id);
 
         apiClient.getApiService().timetable(query).enqueue(new Callback<ResponseBody>() {
             @Override
@@ -128,7 +128,7 @@ public class Request {
                     information.setLessons(lessons);
                     FileManager.writeInfo(context, information);
 
-                    new SessionManager(context).saveLessonsDate(dateRange.getFromDate());
+                    new SessionManager(context).saveLessonsDateTime(dateRange.getFromDate());
 
                     if (dateRange.isToday()) {
                         JSONUtils.filterLessonsByCurrentTime(context);
@@ -137,9 +137,29 @@ public class Request {
                     lessons = FileManager.readInfo(context).getLessons();
 
                     if (lessons.length() != 0) {
-                        Alarm.startAlarm(context, lessons.getJSONObject(0), information);
+                        JSONObject nextLesson = lessons.getJSONObject(0);
+
+                        Alarm.startAlarm(
+                                context,
+                                nextLesson,
+                                DateTimeUtils.getAlarmTime(
+                                        context,
+                                        DateTimeUtils.getSpecificDateTime(new Time(nextLesson.getString("time"))),
+                                        information
+                                ),
+                                information
+                        );
+
+                        String unformattedMessage = context.getString(R.string.lessons_message);
+                        String message = String.format(
+                                Locale.getDefault(),
+                                unformattedMessage, nextLesson.getInt("number"), nextLesson.getString("name")
+                        );
+
+                        AlarmNotification.sendNotification(context, message, true, null);
+                        AlarmClockActivity.updateActivity(context);
                     } else {
-                        AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), false);
+                        AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), false, null);
                         AlarmClockActivity.updateActivity(context);
                     }
                 } catch (IOException | JSONException e) {
@@ -149,7 +169,7 @@ public class Request {
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
-                AlarmNotification.sendNotification(context, context.getString(R.string.failed_timetable_request_message), null);
+                AlarmNotification.sendNotification(context, context.getString(R.string.failed_timetable_request_message), null, lessonsType);
                 AlarmClockActivity.updateActivity(context);
             }
         });

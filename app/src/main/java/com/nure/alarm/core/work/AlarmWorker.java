@@ -41,7 +41,7 @@ public class AlarmWorker extends Worker {
         if (information.getAlarm().length() == 0) {
             try {
                 Request request = new Request(getApplicationContext());
-                request.getTimeTable(new DateRange(dateTime), information.getGroup().getLong("id"));
+                request.getTimeTable(new DateRange(dateTime), information.getGroup().getLong("id"), lessonsType);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

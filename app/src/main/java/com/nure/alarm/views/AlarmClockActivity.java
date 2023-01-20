@@ -100,7 +100,7 @@ public class AlarmClockActivity extends AppCompatActivity {
                 Calendar now = Calendar.getInstance();
 
                 Calendar alarmTime = DateTimeUtils.getSpecificDateTime(new Time(information.getAlarm().getString("time")));
-                if (!new DateRange(sessionManager.fetchLessonsDate()).isToday()) {
+                if (!new DateRange(sessionManager.fetchLessonsDateTime()).isToday()) {
                     alarmTime.add(Calendar.DATE, 1);
                 }
 
@@ -278,7 +278,7 @@ public class AlarmClockActivity extends AppCompatActivity {
 
             ListView listView = dialog.findViewById(R.id.lesson_list_view);
 
-            if (new DateRange(sessionManager.fetchLessonsDate()).isToday()) {
+            if (new DateRange(sessionManager.fetchLessonsDateTime()).isToday()) {
                 JSONUtils.filterLessonsByCurrentTime(getApplicationContext());
             }
             JSONArray lessons = FileManager.readInfo(getApplicationContext()).getLessons();
@@ -307,7 +307,18 @@ public class AlarmClockActivity extends AppCompatActivity {
                 try {
                     if (information.getAlarm().getInt("number") != lessons.getJSONObject(position).getInt("number")) {
                         Alarm.cancelAlarm(getApplicationContext());
-                        Alarm.startAlarm(context, lessons.getJSONObject(position), information);
+                        Alarm.startAlarm(
+                                context,
+                                lessons.getJSONObject(position),
+                                DateTimeUtils.getAlarmTime(
+                                        context,
+                                        DateTimeUtils.getSpecificDateTime(new Time(lessons.getJSONObject(position).getString("time"))),
+                                        information
+                                ),
+                                information
+                        );
+
+                        AlarmClockActivity.updateActivity(context);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
