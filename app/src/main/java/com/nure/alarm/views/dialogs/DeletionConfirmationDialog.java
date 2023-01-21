@@ -12,6 +12,7 @@ import com.nure.alarm.R;
 import com.nure.alarm.core.Alarm;
 import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.notification.AlarmNotification;
 import com.nure.alarm.views.AlarmClockActivity;
 
 import org.json.JSONArray;
@@ -30,6 +31,7 @@ public class DeletionConfirmationDialog extends AppCompatDialogFragment {
                     FileManager.writeInfo(requireActivity().getApplicationContext(), information);
 
                     Alarm.cancelAlarm(requireActivity().getApplicationContext());
+                    AlarmNotification.cancelNotification(requireActivity().getApplicationContext(), AlarmNotification.NOTIFICATION_ID);
                     AlarmClockActivity.updateActivity(requireActivity().getApplicationContext());
                 })
                 .setNegativeButton(R.string.no, null);

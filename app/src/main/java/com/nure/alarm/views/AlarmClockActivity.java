@@ -37,6 +37,7 @@ import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.models.LessonsType;
 import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.network.NetworkInfo;
+import com.nure.alarm.core.notification.AlarmNotification;
 import com.nure.alarm.core.notification.AlarmNotificationReceiver;
 import com.nure.alarm.core.utils.ActivityUtils;
 import com.nure.alarm.core.utils.DateTimeUtils;
@@ -318,6 +319,7 @@ public class AlarmClockActivity extends AppCompatActivity {
                                 information
                         );
 
+                        AlarmNotification.cancelNotification(context, AlarmNotification.NOTIFICATION_ID);
                         AlarmClockActivity.updateActivity(context);
                     }
                 } catch (JSONException e) {

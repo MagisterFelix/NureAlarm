@@ -66,4 +66,9 @@ public class AlarmNotification {
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
         notificationManagerCompat.notify(NOTIFICATION_ID, notification);
     }
+
+    public static void cancelNotification(Context context, int id) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(id);
+    }
 }
