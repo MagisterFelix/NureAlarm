@@ -258,10 +258,10 @@ public class Request {
                         );
 
                         AlarmNotification.sendNotification(context, message, true, null);
-                        AlarmClockActivity.updateActivity(context);
+                        AlarmClockActivity.updateActivity(context, false);
                     } else {
                         AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), false, null);
-                        AlarmClockActivity.updateActivity(context);
+                        AlarmClockActivity.updateActivity(context, false);
                     }
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
@@ -271,7 +271,7 @@ public class Request {
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable throwable) {
                 AlarmNotification.sendNotification(context, context.getString(R.string.failed_timetable_request_message), null, lessonsType);
-                AlarmClockActivity.updateActivity(context);
+                AlarmClockActivity.updateActivity(context, false);
             }
         });
     }

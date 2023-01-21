@@ -32,7 +32,7 @@ public class DeletionConfirmationDialog extends AppCompatDialogFragment {
 
                     Alarm.cancelAlarm(requireActivity().getApplicationContext());
                     AlarmNotification.cancelNotification(requireActivity().getApplicationContext(), AlarmNotification.NOTIFICATION_ID);
-                    AlarmClockActivity.updateActivity(requireActivity().getApplicationContext());
+                    AlarmClockActivity.updateActivity(requireActivity().getApplicationContext(), false);
                 })
                 .setNegativeButton(R.string.no, null);
         return builder.create();

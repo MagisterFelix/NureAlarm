@@ -24,7 +24,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
 
         if (action.equals(ACTION_DISMISS)) {
             Alarm.stopAlarm(context);
-            AlarmClockActivity.updateActivity(context);
+            AlarmClockActivity.updateActivity(context, false);
         } else {
             NotificationManagerCompat.from(context).cancel(AlarmNotification.NOTIFICATION_ID);
 
@@ -37,12 +37,12 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
             } else {
                 if (action.equals(ACTION_REMOVE)) {
                     Alarm.cancelAlarm(context);
+                    AlarmClockActivity.updateActivity(context, false);
                 }
                 if (action.equals(ACTION_RETRY)) {
                     AlarmWorkerReceiver.startWork(context, intent.getIntExtra(LessonsType.class.getSimpleName(), LessonsType.AUTO));
+                    AlarmClockActivity.updateActivity(context, true);
                 }
-
-                AlarmClockActivity.updateActivity(context);
             }
         }
     }

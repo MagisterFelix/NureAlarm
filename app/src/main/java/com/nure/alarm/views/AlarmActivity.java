@@ -82,7 +82,7 @@ public class AlarmActivity extends AppCompatActivity {
             handler.removeCallbacks(runnable);
 
             Alarm.stopAlarm(getApplicationContext());
-            AlarmClockActivity.updateActivity(getApplicationContext());
+            AlarmClockActivity.updateActivity(getApplicationContext(), false);
             finish();
         });
     }

@@ -64,6 +64,7 @@ public class AlarmClockActivity extends AppCompatActivity {
     private BroadcastReceiver broadcastReceiver;
 
     public static final String UPDATE_ACTIVITY_ACTION = "update";
+    private static final String SET_LOADING_ICON = "set_loading_icon";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,6 +188,10 @@ public class AlarmClockActivity extends AppCompatActivity {
                     return false;
                 }
             });
+
+            if (getIntent().getBooleanExtra(SET_LOADING_ICON, false)) {
+                setLoadingIcon(addAlarm);
+            }
         }
 
         return true;
@@ -209,14 +214,16 @@ public class AlarmClockActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Intent alarmClockActivity = new Intent(context, AlarmClockActivity.class);
+                alarmClockActivity.putExtra(SET_LOADING_ICON, intent.getBooleanExtra(SET_LOADING_ICON, false));
                 ActivityUtils.startActivity(AlarmClockActivity.this, alarmClockActivity);
             }
         };
         registerReceiver(broadcastReceiver, new IntentFilter(UPDATE_ACTIVITY_ACTION));
     }
 
-    public static void updateActivity(Context context) {
+    public static void updateActivity(Context context, boolean setLoadingIcon) {
         Intent updateIntent = new Intent(UPDATE_ACTIVITY_ACTION);
+        updateIntent.putExtra(SET_LOADING_ICON, setLoadingIcon);
         context.sendBroadcast(updateIntent);
     }
 
@@ -224,6 +231,14 @@ public class AlarmClockActivity extends AppCompatActivity {
         Intent mainActivity = new Intent(getApplicationContext(), MainActivity.class);
         mainActivity.putExtra(ActivityUtils.CHECK_LAST_ACTIVITY, checkLastActivity);
         ActivityUtils.startActivity(AlarmClockActivity.this, mainActivity);
+    }
+
+    private void setLoadingIcon(MenuItem menuItem) {
+        ProgressBar progressBar = new ProgressBar(getApplicationContext());
+        progressBar.setScaleX(0.6f);
+        progressBar.setScaleY(0.6f);
+        progressBar.setIndeterminateTintList(ColorStateList.valueOf(Color.WHITE));
+        menuItem.setActionView(progressBar);
     }
 
     private void chooseOption(MenuItem menuItem) {
@@ -247,13 +262,7 @@ public class AlarmClockActivity extends AppCompatActivity {
             listView.setAdapter(optionsAdapter);
             listView.setOnItemClickListener((parent, view, position, id) -> {
                 AlarmWorkerReceiver.startWork(getApplicationContext(), position == 0 ? LessonsType.TODAY_NEAREST : LessonsType.TOMORROW_FIRST);
-
-                ProgressBar progressBar = new ProgressBar(getApplicationContext());
-                progressBar.setScaleX(0.6f);
-                progressBar.setScaleY(0.6f);
-                progressBar.setIndeterminateTintList(ColorStateList.valueOf(Color.WHITE));
-                menuItem.setActionView(progressBar);
-
+                setLoadingIcon(menuItem);
                 dialog.dismiss();
             });
         });
@@ -320,7 +329,7 @@ public class AlarmClockActivity extends AppCompatActivity {
                         );
 
                         AlarmNotification.cancelNotification(context, AlarmNotification.NOTIFICATION_ID);
-                        AlarmClockActivity.updateActivity(context);
+                        AlarmClockActivity.updateActivity(context, false);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
