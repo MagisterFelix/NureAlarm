@@ -7,9 +7,13 @@
     <string name="label_alarm">Alarm setting time</string>
     <string name="label_group">Group</string>
     <string name="label_activation">Activation</string>
+    <string name="label_excluded_subjects">Excluded subjects</string>
     <string name="permission_message">You must grant NureAlarm permission to display over other apps.</string>
     <string name="select_group">Select group</string>
     <string name="select_lesson">Select lesson</string>
+    <string name="select_subjects">Select subjects</string>
+    <string name="nothing_selected">Nothing selected</string>
+    <string name="all_subjects">All subjects</string>
     <string name="change_lesson">Change lesson</string>
     <string name="select_option">Select option</string>
     <string name="option_today_nearest">The next today\'s lesson</string>
@@ -18,8 +22,10 @@
     <string name="remove">Remove</string>
     <string name="search">Search…</string>
     <string name="receiving_groups_message">NureAlarm receives a list of groups, please wait a moment.</string>
+    <string name="receiving_subjects_message">NureAlarm receives a list of subjects, please wait a moment.</string>
     <string name="unavailable_network_message">In order to use NureAlarm you need a stable internet connection. Please connect to Wi-Fi or turn on the mobile network.</string>
     <string name="failed_groups_request_message">Failed to get list of groups. You may have a poor internet connection or the cist.nure.ua is not responding.</string>
+    <string name="failed_subjects_request_message">Failed to get list of subjects. You may have a poor internet connection or the cist.nure.ua is not responding.</string>
     <string name="not_specified_information_message">To start the application, you must specify the group.</string>
     <string name="empty_list_of_elements_message">A list that you are trying to get does not have a single element.</string>
     <string name="failed_timetable_request_message">Failed to get list of lessons. You may have a poor internet connection or the cist.nure.ua is not responding.</string>
@@ -34,7 +40,7 @@
         <item>2 hours</item>
     </string-array>
     <string name="locale">Locale</string>
-    <string name="help_message"><b>Alarm setting time</b> - the time at which the alarm will be set. For example: if 20:00 is set, then every day at 20:00 the alarm will be set for the first lesson and you will receive a notification.\n\n<b>Group</b> - the group in which you study.\n\n<b>Activation</b> - how many minutes/hours before the lesson the alarm will go off. For example: if 30 minutes is set and the lesson starts at 11:15, then the alarm will be set to 10:45.\n\n</string>
+    <string name="help_message"><b>Alarm setting time</b> - the time at which the alarm will be set. For example: if 20:00 is set, then every day at 20:00 the alarm will be set for the first lesson and you will receive a notification.\n\n<b>Group</b> - the group in which you study.\n\n<b>Activation</b> - how many minutes/hours before the lesson the alarm will go off. For example: if 30 minutes is set and the lesson starts at 11:15, then the alarm will be set to 10:45.\n\n<b>Excluded subjects</b> - subjects that will not be taken into account when receiving data and setting the alarm.</string>
     <string name="settings">Settings</string>
     <string name="no_alarm">No alarm</string>
     <string name="time_left">(%d h %d min left)</string>
@@ -43,10 +49,12 @@
     <string name="no">no</string>
     <string name="confirmation_dialog">Confirmation</string>
     <string name="failed_groups_request_dialog">Groups request failed</string>
+    <string name="failed_subjects_request_dialog">Subjects request failed</string>
     <string name="help_dialog">Help</string>
     <string name="not_specified_information_dialog">Information not specified</string>
     <string name="empty_list_of_elements_dialog">Empty list of elements</string>
     <string name="receiving_groups_dialog">Getting groups</string>
+    <string name="receiving_subjects_dialog">Getting subjects</string>
     <string name="unavailable_network_dialog">Unavailable network</string>
     <string name="ok">OK</string>
     <string name="retry">Retry</string>

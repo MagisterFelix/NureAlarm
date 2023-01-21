@@ -33,16 +33,19 @@ import com.nure.alarm.core.api.Request;
 import com.nure.alarm.core.managers.ContextManager;
 import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
+import com.nure.alarm.core.models.DateRange;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.network.NetworkInfo;
 import com.nure.alarm.core.updater.Updater;
 import com.nure.alarm.core.utils.ActivityUtils;
+import com.nure.alarm.core.utils.JSONUtils;
 import com.nure.alarm.views.dialogs.EmptyListOfElementsDialog;
 import com.nure.alarm.views.dialogs.HelpDialog;
 import com.nure.alarm.views.dialogs.NotSpecifiedInformationDialog;
 import com.nure.alarm.views.dialogs.UnavailableNetworkDialog;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -138,6 +141,57 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 UnavailableNetworkDialog unavailableNetworkDialog = new UnavailableNetworkDialog();
                 unavailableNetworkDialog.show(getSupportFragmentManager(), UnavailableNetworkDialog.class.getSimpleName());
+            }
+        });
+
+        TextView excludedSubjectsTextView = findViewById(R.id.excluded_subjects);
+        if (information.getExcludedSubjects().length() != 0) {
+            if (JSONUtils.getArrayListFromJSONArray(information.getExcludedSubjects()).size() == FileManager.readSubjects(getApplicationContext()).size()) {
+                excludedSubjectsTextView.setText(getString(R.string.all_subjects));
+            } else {
+                try {
+                    excludedSubjectsTextView.setText(information.getExcludedSubjects().join(", ").replaceAll("\"", ""));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        excludedSubjectsTextView.setOnClickListener(v -> {
+            if (information.getGroup().length() == 0) {
+                NotSpecifiedInformationDialog notSpecifiedInformationDialog = new NotSpecifiedInformationDialog();
+                notSpecifiedInformationDialog.show(getSupportFragmentManager(), NotSpecifiedInformationDialog.class.getSimpleName());
+            } else {
+                if (NetworkInfo.isNetworkAvailable(getApplication())) {
+                    Calendar now = Calendar.getInstance();
+                    Calendar lastTime = Calendar.getInstance();
+                    lastTime.setTimeInMillis(sessionManager.fetchSubjectsRequestTime());
+
+                    if (TimeUnit.MILLISECONDS.toDays(now.getTimeInMillis() - lastTime.getTimeInMillis()) > 0
+                            || FileManager.readSubjects(getApplicationContext()).size() == 0) {
+                        Request request = new Request(getApplicationContext());
+                        try {
+                            request.getSubjects(
+                                    this,
+                                    getSupportFragmentManager(),
+                                    excludedSubjectsTextView,
+                                    getSemesterInterval(),
+                                    information.getGroup().getLong("id")
+                            );
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        if (FileManager.readSubjects(ContextManager.getLocaleContext(getApplicationContext())).size() != 0) {
+                            showSubjects(this, ContextManager.getLocaleContext(getApplicationContext()), excludedSubjectsTextView);
+                        } else {
+                            EmptyListOfElementsDialog emptyListOfElementsDialog = new EmptyListOfElementsDialog();
+                            emptyListOfElementsDialog.show(getSupportFragmentManager(), EmptyListOfElementsDialog.class.getSimpleName());
+                        }
+                    }
+                } else {
+                    UnavailableNetworkDialog unavailableNetworkDialog = new UnavailableNetworkDialog();
+                    unavailableNetworkDialog.show(getSupportFragmentManager(), UnavailableNetworkDialog.class.getSimpleName());
+                }
             }
         });
 
@@ -250,6 +304,29 @@ public class MainActivity extends AppCompatActivity {
         ActivityUtils.startActivity(MainActivity.this, alarmClockActivity);
     }
 
+    private DateRange getSemesterInterval() {
+        Calendar dateTime = Calendar.getInstance();
+
+        int month = dateTime.get(Calendar.MONTH);
+        if (month == Calendar.JANUARY) {
+            dateTime.add(Calendar.YEAR, -1);
+        }
+        int year = dateTime.get(Calendar.YEAR);
+
+        Calendar fromDate = Calendar.getInstance();
+        Calendar toDate = Calendar.getInstance();
+
+        if (month > Calendar.JULY || month == Calendar.JANUARY) {
+            fromDate.set(year, Calendar.SEPTEMBER, 1);
+            toDate.set(year + 1, Calendar.JANUARY, 31);
+            return new DateRange(fromDate, toDate);
+        }
+
+        fromDate.set(year, Calendar.FEBRUARY, 1);
+        toDate.set(year, Calendar.JULY, 31);
+        return new DateRange(fromDate, toDate);
+    }
+
     public static void showGroups(Activity activity, Context context, TextView groupTextView) {
         HashMap<String, Integer> groups = FileManager.readGroups(context);
         double kf = groups.size() > 7 ? 0.7 : (double) (groups.size() - 1) / 10;
@@ -300,6 +377,70 @@ public class MainActivity extends AppCompatActivity {
             FileManager.writeInfo(context, information);
 
             dialog.dismiss();
+        });
+    }
+
+    public static void showSubjects(Activity activity, Context context, TextView excludedSubjectsTextView) {
+        ArrayList<String> subjects = FileManager.readSubjects(context);
+        double kf = subjects.size() > 7 ? 0.7 : (double) (subjects.size() - 1) / 10;
+
+        Dialog dialog = new Dialog(activity);
+        dialog.setContentView(R.layout.subjects_spinner);
+
+        int width = (int) (context.getResources().getDisplayMetrics().widthPixels * 0.9);
+        int height = (int) (context.getResources().getDisplayMetrics().heightPixels * kf);
+
+        dialog.getWindow().setLayout(width, height);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        dialog.show();
+
+        ListView listView = dialog.findViewById(R.id.subjects_list_view);
+
+        ArrayAdapter<String> groupAdapter = new ArrayAdapter<>(context, R.layout.subject_item, subjects);
+
+        Information information = FileManager.readInfo(context);
+        JSONArray excludedSubjects = information.getExcludedSubjects();
+        ArrayList<String> excludedSubjectsArray = JSONUtils.getArrayListFromJSONArray(excludedSubjects);
+
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        listView.setAdapter(groupAdapter);
+
+        if (excludedSubjectsArray.size() != 0) {
+            for (int i = 0; i < subjects.size(); ++i) {
+                if (excludedSubjectsArray.contains(subjects.get(i))) {
+                    listView.setItemChecked(i, true);
+                }
+            }
+        }
+
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            if (listView.isItemChecked(position)) {
+                excludedSubjects.put(groupAdapter.getItem(position));
+            } else {
+                for (int i = 0; i < excludedSubjects.length(); ++i) {
+                    try {
+                        if (excludedSubjects.getString(i).equals(groupAdapter.getItem(position))) {
+                            excludedSubjects.remove(i);
+                            break;
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            information.setExcludedSubjects(excludedSubjects);
+            FileManager.writeInfo(context, information);
+
+            if (JSONUtils.getArrayListFromJSONArray(excludedSubjects).size() == subjects.size()) {
+                excludedSubjectsTextView.setText(context.getString(R.string.all_subjects));
+            } else {
+                try {
+                    excludedSubjectsTextView.setText(excludedSubjects.join(", ").replaceAll("\"", ""));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         });
     }
 }

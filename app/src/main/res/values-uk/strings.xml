@@ -7,9 +7,13 @@
     <string name="label_alarm">Час встановлення</string>
     <string name="label_group">Група</string>
     <string name="label_activation">Активація</string>
+    <string name="label_excluded_subjects">Виключені предмети</string>
     <string name="permission_message">Ви повинні надати NureAlarm дозвіл на відображення поверх інших програм.</string>
     <string name="select_group">Оберіть групу</string>
     <string name="select_lesson">Оберіть заняття</string>
+    <string name="select_subjects">Оберіть предмети</string>
+    <string name="nothing_selected">Нічого не обрано</string>
+    <string name="all_subjects">Всі предмети</string>
     <string name="change_lesson">Змінити заняття</string>
     <string name="select_option">Оберіть опцію</string>
     <string name="option_today_nearest">Наступне заняття поточного дня</string>
@@ -18,8 +22,10 @@
     <string name="remove">Видалити</string>
     <string name="search">Пошук…</string>
     <string name="receiving_groups_message">NureAlarm отримує список груп, зачекайте трохи.</string>
+    <string name="receiving_subjects_message">NureAlarm отримує список предметів, зачекайте трохи.</string>
     <string name="unavailable_network_message">Для використання NureAlarm потрібне стабільне підключення до Інтернету. Підключіться до Wi-Fi або увімкніть мобільну мережу.</string>
     <string name="failed_groups_request_message">Не вдалося отримати список груп. Можливо, у вас погане інтернет-зʼєднання або cist.nure.ua не відповідає.</string>
+    <string name="failed_subjects_request_message">Не вдалося отримати список предметів. Можливо, у вас погане інтернет-зʼєднання або cist.nure.ua не відповідає.</string>
     <string name="not_specified_information_message">Для запуску програми необхідно вказати групу.</string>
     <string name="empty_list_of_elements_message">Список, який ви намагаєтесь отримати, не має жодного елемента.</string>
     <string name="failed_timetable_request_message">Не вдалося отримати список занять. Можливо, у вас погане інтернет-з’єднання або cist.nure.ua не відповідає.</string>
@@ -34,7 +40,7 @@
         <item>За 2 години</item>
     </string-array>
     <string name="locale">Локаль</string>
-    <string name="help_message"><b>Час встановлення</b> - час, в який буде встановлено будильник. Наприклад: якщо встановлено 20:00, то кожен день о 20:00 будильник буде встановлюватися на перше заняття і ви будете отримувати сповіщення.\n\n<b>Група</b> - група, в якій ви навчаєтесь.\n\n<b>Активація</b> - за скільки хвилин/годин до заняття спрацює будильник. Наприклад: якщо встановлено 30 хвилин і заняття починається об 11:15, будильник буде встановлено на 10:45.\n\n</string>
+    <string name="help_message"><b>Час встановлення</b> - час, в який буде встановлено будильник. Наприклад: якщо встановлено 20:00, то кожен день о 20:00 будильник буде встановлюватися на перше заняття і ви будете отримувати сповіщення.\n\n<b>Група</b> - група, в якій ви навчаєтесь.\n\n<b>Активація</b> - за скільки хвилин/годин до заняття спрацює будильник. Наприклад: якщо встановлено 30 хвилин і заняття починається об 11:15, будильник буде встановлено на 10:45.\n\n<b>Виключені предмети</b> - предмети, які не будуть враховуватися під час отримання даних та установки будильника.</string>
     <string name="settings">Налаштування</string>
     <string name="no_alarm">Немає\nбудильника</string>
     <string name="time_left">(залишилось %d год %d хв)</string>
@@ -43,10 +49,12 @@
     <string name="no">ні</string>
     <string name="confirmation_dialog">Підтвердження</string>
     <string name="failed_groups_request_dialog">Помилка запиту груп</string>
+    <string name="failed_subjects_request_dialog">Помилка запиту предметів</string>
     <string name="help_dialog">Допомога</string>
     <string name="not_specified_information_dialog">Не вказана інформація</string>
     <string name="empty_list_of_elements_dialog">Пустий список елементів</string>
     <string name="receiving_groups_dialog">Отримання груп</string>
+    <string name="receiving_subjects_dialog">Отримання предметів</string>
     <string name="unavailable_network_dialog">Недоступна мережа</string>
     <string name="ok">ОК</string>
     <string name="retry">Повторити спробу</string>

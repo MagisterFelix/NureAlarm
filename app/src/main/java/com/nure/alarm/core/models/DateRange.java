@@ -9,6 +9,11 @@ public class DateRange {
     private final Calendar fromDate;
     private final Calendar toDate;
 
+    public DateRange(Calendar fromDate, Calendar toDate) {
+        this.fromDate = fromDate;
+        this.toDate = toDate;
+    }
+
     public DateRange(Calendar date) {
         this.fromDate = date;
         this.toDate = date;

@@ -12,6 +12,7 @@ public class SessionManager {
     private final SharedPreferences sharedPreferences;
 
     private static final String KEY_GROUP_REQUEST_TIME = "group_request_time";
+    private static final String KEY_SUBJECTS_REQUEST_TIME = "subjects_request_time";
     private static final String KEY_LESSONS_DATE_TIME = "lessons_date_time";
     private static final String KEY_LOCALE = "locale";
     private static final String KEY_LAST_ACTIVITY = "last_activity";
@@ -33,6 +34,18 @@ public class SessionManager {
         Calendar fromStart = Calendar.getInstance();
         fromStart.setTimeInMillis(0);
         return sharedPreferences.getLong(KEY_GROUP_REQUEST_TIME, fromStart.getTimeInMillis());
+    }
+
+    public void saveSubjectsRequestTime(long time) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong(KEY_SUBJECTS_REQUEST_TIME, time);
+        editor.apply();
+    }
+
+    public long fetchSubjectsRequestTime() {
+        Calendar fromStart = Calendar.getInstance();
+        fromStart.setTimeInMillis(0);
+        return sharedPreferences.getLong(KEY_SUBJECTS_REQUEST_TIME, fromStart.getTimeInMillis());
     }
 
     public void saveLessonsDateTime(Calendar dateTime) {

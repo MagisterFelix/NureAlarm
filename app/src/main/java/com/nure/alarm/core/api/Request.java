@@ -18,13 +18,17 @@ import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
 import com.nure.alarm.core.models.DateRange;
 import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.notification.AlarmNotification;
+import com.nure.alarm.core.utils.DateTimeUtils;
 import com.nure.alarm.core.utils.JSONUtils;
 import com.nure.alarm.views.AlarmClockActivity;
 import com.nure.alarm.views.MainActivity;
 import com.nure.alarm.views.dialogs.EmptyListOfElementsDialog;
 import com.nure.alarm.views.dialogs.FailedGroupsRequestDialog;
+import com.nure.alarm.views.dialogs.FailedSubjectsRequestDialog;
 import com.nure.alarm.views.dialogs.ReceivingGroupsDialog;
+import com.nure.alarm.views.dialogs.ReceivingSubjectsDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,9 +39,12 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -99,6 +106,81 @@ public class Request {
         });
     }
 
+    public void getSubjects(Activity activity, FragmentManager fragmentManager, TextView excludedSubjectsTextView, DateRange dateRange, long group_id) {
+        ReceivingSubjectsDialog receivingSubjectsDialog = new ReceivingSubjectsDialog();
+        receivingSubjectsDialog.setCancelable(false);
+        receivingSubjectsDialog.show(fragmentManager, ReceivingSubjectsDialog.class.getSimpleName());
+
+        String unformattedQuery = "778:201::::201:P201_FIRST_DATE,P201_LAST_DATE,P201_GROUP,P201_POTOK:%s,%d,0:";
+        String query = String.format(Locale.getDefault(), unformattedQuery, dateRange.getRange(), group_id);
+
+        apiClient.getApiService().timetable(query).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                try {
+                    JSONArray subjects = new JSONArray();
+
+                    String html = Objects.requireNonNull(response.body()).string();
+                    Document document = Jsoup.parse(html);
+                    Element table = document.select("table[class=footer]").first();
+                    Elements elements = table.select("td[class=name]");
+
+                    for (Element element : elements) {
+                        subjects.put(element.text());
+                    }
+
+                    FileManager.writeSubjects(context, subjects);
+                    new SessionManager(context).saveSubjectsRequestTime(Calendar.getInstance().getTimeInMillis());
+
+                    Information information = FileManager.readInfo(context);
+
+                    ArrayList<String> subjectsArray = JSONUtils.getArrayListFromJSONArray(subjects);
+                    ArrayList<String> excludedSubjectsArray = JSONUtils.getArrayListFromJSONArray(information.getExcludedSubjects());
+
+                    if (excludedSubjectsArray.size() != 0) {
+                        int i = 0;
+                        while (i < subjectsArray.size()) {
+                            if (excludedSubjectsArray.contains(subjectsArray.get(i))) {
+                                break;
+                            }
+                            ++i;
+                        }
+                        if (i == subjectsArray.size()) {
+                            information.setExcludedSubjects(new JSONArray());
+                            FileManager.writeInfo(context, information);
+                            excludedSubjectsTextView.setText("");
+                        }
+                    }
+
+                    try {
+                        receivingSubjectsDialog.dismiss();
+                        if (FileManager.readSubjects(context).size() != 0) {
+                            MainActivity.showSubjects(activity, context, excludedSubjectsTextView);
+                        } else {
+                            EmptyListOfElementsDialog emptyListOfElementsDialog = new EmptyListOfElementsDialog();
+                            emptyListOfElementsDialog.show(fragmentManager, EmptyListOfElementsDialog.class.getSimpleName());
+                        }
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull Throwable throwable) {
+                try {
+                    receivingSubjectsDialog.dismiss();
+                    FailedSubjectsRequestDialog failedSubjectsRequestDialog = new FailedSubjectsRequestDialog();
+                    failedSubjectsRequestDialog.show(fragmentManager, FailedSubjectsRequestDialog.class.getSimpleName());
+                } catch (IllegalStateException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
     public void getTimeTable(DateRange dateRange, long group_id, int lessonsType) {
         String unformattedQuery = "778:201::::201:P201_FIRST_DATE,P201_LAST_DATE,P201_GROUP,P201_POTOK:%s,%d,0:";
         String query = String.format(Locale.getDefault(), unformattedQuery, dateRange.getRange(), group_id);
@@ -114,17 +196,36 @@ public class Request {
                     Element table = document.select("table[class=MainTT]").first();
                     Elements elements = table.select("tr:has(td[class=left])");
 
+                    Information information = FileManager.readInfo(context);
+                    ArrayList<String> excludedSubjects = JSONUtils.getArrayListFromJSONArray(information.getExcludedSubjects());
+
                     for (Element element : elements) {
-                        JSONObject lesson = new JSONObject();
+                        ArrayList<String> parsedLessons = new ArrayList<>();
 
-                        lesson.put("number", Integer.parseInt(element.child(0).text()));
-                        lesson.put("time", element.child(1).text());
-                        lesson.put("name", element.child(2).select("a").text());
+                        Pattern pattern = Pattern.compile("(\\S+\\s*\\s*\\S+)");
+                        Matcher matcher = pattern.matcher(element.child(2).select("a").text());
+                        while (matcher.find()) {
+                            parsedLessons.add(matcher.group());
+                        }
 
-                        lessons.put(lesson);
+                        StringBuilder filteredLessons = new StringBuilder();
+                        for (String parsedLesson : parsedLessons) {
+                            if (!excludedSubjects.contains(parsedLesson.substring(0, parsedLesson.indexOf(" ")))) {
+                                filteredLessons.append(parsedLesson).append(" ");
+                            }
+                        }
+
+                        if (filteredLessons.length() != 0) {
+                            JSONObject lesson = new JSONObject();
+
+                            lesson.put("number", Integer.parseInt(element.child(0).text()));
+                            lesson.put("time", element.child(1).text());
+                            lesson.put("name", filteredLessons.toString().trim());
+
+                            lessons.put(lesson);
+                        }
                     }
 
-                    Information information = FileManager.readInfo(context);
                     information.setLessons(lessons);
                     FileManager.writeInfo(context, information);
 

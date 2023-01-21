@@ -95,8 +95,36 @@
                 android:gravity="center_vertical"
                 android:minWidth="128dp"
                 android:minHeight="48dp"
-                android:theme="@style/ThemeOverlay.AppCompat.Light"
-                android:spinnerMode="dropdown" />
+                android:spinnerMode="dropdown"
+                android:theme="@style/ThemeOverlay.AppCompat.Light" />
+
+            <TextView
+                android:id="@+id/label_excluded_subjects"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/activation"
+                android:layout_alignStart="@+id/group"
+                android:layout_alignEnd="@id/activation"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="2dp"
+                android:text="@string/label_excluded_subjects"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/excluded_subjects"
+                android:layout_width="140dp"
+                android:layout_height="60dp"
+                android:layout_below="@id/label_excluded_subjects"
+                android:layout_alignStart="@id/label_excluded_subjects"
+                android:layout_alignEnd="@id/label_excluded_subjects"
+                android:background="@android:drawable/editbox_background"
+                android:gravity="center"
+                android:hint="@string/nothing_selected"
+                android:padding="12dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/black"
+                app:drawableEndCompat="@drawable/ic_arrow" />
 
         </RelativeLayout>
 
