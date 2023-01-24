@@ -11,7 +11,7 @@ import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.utils.DateTimeUtils;
 import com.nure.alarm.core.work.AlarmWorkManager;
-import com.nure.alarm.views.MainActivity;
+import com.nure.alarm.views.AlarmClockActivity;
 import com.nure.alarm.views.dialogs.DeletionConfirmationDialog;
 
 import org.json.JSONException;
@@ -24,15 +24,15 @@ import java.util.Locale;
 public class Alarm {
 
     public static void setAlarm(Context context, long time) {
-        PendingIntent mainActivity = PendingIntent.getActivity(context, 0,
-                new Intent(context, MainActivity.class),
+        PendingIntent alarmClockActivity = PendingIntent.getActivity(context, 0,
+                new Intent(context, AlarmClockActivity.class),
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent alarmReceiver = PendingIntent.getBroadcast(context, 0,
                 new Intent(context, AlarmReceiver.class),
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(time, mainActivity), alarmReceiver);
+        alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(time, alarmClockActivity), alarmReceiver);
     }
 
     public static void cancelAlarm(Context context) {

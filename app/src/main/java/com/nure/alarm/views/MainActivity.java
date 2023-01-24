@@ -241,7 +241,6 @@ public class MainActivity extends AppCompatActivity {
         help.setOnMenuItemClickListener(menuItem -> {
             HelpDialog helpDialog = new HelpDialog();
             helpDialog.show(getSupportFragmentManager(), HelpDialog.class.getSimpleName());
-
             return true;
         });
 
@@ -256,7 +255,6 @@ public class MainActivity extends AppCompatActivity {
             menuItem.setIcon(sessionManager.fetchLocale().equals("uk") ? R.mipmap.ic_uk : R.mipmap.ic_en);
             Intent mainActivity = new Intent(getApplicationContext(), MainActivity.class);
             ActivityUtils.startActivity(MainActivity.this, mainActivity);
-
             return true;
         });
 

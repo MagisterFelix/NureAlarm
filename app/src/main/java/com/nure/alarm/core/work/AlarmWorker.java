@@ -47,7 +47,9 @@ public class AlarmWorker extends Worker {
             }
         }
 
-        Alarm.enableAlarmWork(getApplicationContext(), information);
+        if (information.isEnabled()) {
+            Alarm.enableAlarmWork(getApplicationContext(), information);
+        }
 
         return Result.success();
     }
