@@ -51,6 +51,7 @@ public class AlarmService extends Service {
     private void setUpMediaPlayer() {
         Uri alarmTone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         mediaPlayer = new MediaPlayer();
+
         try {
             mediaPlayer.setDataSource(getApplicationContext(), alarmTone);
             mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build());
@@ -107,7 +108,9 @@ public class AlarmService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
         information = FileManager.readInfo(getApplicationContext());
+
         setUpMediaPlayer();
         setUpVibration();
         setUpNotification();
@@ -117,6 +120,7 @@ public class AlarmService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         mediaPlayer.start();
         vibrator.vibrate(VibrationEffect.createWaveform(new long[]{ 0, 500, 500, 500, 500 }, 0));
+
         return START_STICKY;
     }
 
@@ -125,6 +129,7 @@ public class AlarmService extends Service {
         mediaPlayer.stop();
         mediaPlayer.release();
         vibrator.cancel();
+
         super.onDestroy();
     }
 }

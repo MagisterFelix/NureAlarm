@@ -6,19 +6,19 @@ import org.json.JSONObject;
 public class Information {
 
     private boolean enabled;
-    private int settingHour;
-    private int settingMinute;
-    private int delay;
+    private Time settingTime;
+    private int activation;
     private JSONObject group;
+    private JSONArray excludedSubjects;
     private JSONArray lessons;
     private JSONObject alarm;
 
-    public Information(boolean enabled, int settingHour, int settingMinute, int delay, JSONObject group, JSONArray lessons, JSONObject alarm) {
+    public Information(boolean enabled, Time settingTime, int activation, JSONObject group, JSONArray excludedSubjects, JSONArray lessons, JSONObject alarm) {
         this.enabled = enabled;
-        this.settingHour = settingHour;
-        this.settingMinute = settingMinute;
-        this.delay = delay;
+        this.settingTime = settingTime;
+        this.activation = activation;
         this.group = group;
+        this.excludedSubjects = excludedSubjects;
         this.lessons = lessons;
         this.alarm = alarm;
     }
@@ -31,28 +31,20 @@ public class Information {
         this.enabled = enabled;
     }
 
-    public int getSettingHour() {
-        return settingHour;
+    public Time getSettingTime() {
+        return settingTime;
     }
 
-    public void setSettingHour(int settingHour) {
-        this.settingHour = settingHour;
+    public void setSettingTime(Time settingTime) {
+        this.settingTime = settingTime;
     }
 
-    public int getSettingMinute() {
-        return settingMinute;
+    public int getActivation() {
+        return activation;
     }
 
-    public void setSettingMinute(int settingMinute) {
-        this.settingMinute = settingMinute;
-    }
-
-    public int getDelay() {
-        return delay;
-    }
-
-    public void setDelay(int delay) {
-        this.delay = delay;
+    public void setActivation(int activation) {
+        this.activation = activation;
     }
 
     public JSONObject getGroup() {
@@ -61,6 +53,14 @@ public class Information {
 
     public void setGroup(JSONObject group) {
         this.group = group;
+    }
+
+    public JSONArray getExcludedSubjects() {
+        return excludedSubjects;
+    }
+
+    public void setExcludedSubjects(JSONArray excludedSubjects) {
+        this.excludedSubjects = excludedSubjects;
     }
 
     public JSONArray getLessons() {

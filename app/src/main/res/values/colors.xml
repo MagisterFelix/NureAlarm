@@ -10,7 +10,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#30BDFF</color>
     <color name="purple">#AA65FF</color>
+    <color name="purple_dark">#9F52FF</color>
     <color name="darker_blue">#42A7FF</color>
     <color name="orange">#FF8E31</color>
+    <color name="orange_dark">#FF7300</color>
     <color name="red">#DC1818</color>
 </resources>

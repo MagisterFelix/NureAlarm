@@ -1,6 +1,7 @@
 <resources>
     <style name="Theme.NureAlarm" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <item name="colorPrimary">@color/orange</item>
+        <item name="colorPrimaryDark">@color/orange_dark</item>
         <item name="colorPrimaryVariant">@color/black</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorSecondary">@color/teal_200</item>
@@ -32,6 +33,13 @@
         <item name="colorAccent">@color/orange</item>
         <item name="colorControlNormal">@color/dark</item>
         <item name="colorOnPrimary">@color/orange</item>
+    </style>
+
+    <style name="CircleButton" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:background">@drawable/round_button</item>
     </style>
 
 </resources>

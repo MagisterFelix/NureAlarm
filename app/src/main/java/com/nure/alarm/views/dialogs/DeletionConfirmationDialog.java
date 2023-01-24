@@ -10,19 +10,29 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.nure.alarm.R;
 import com.nure.alarm.core.Alarm;
+import com.nure.alarm.core.managers.FileManager;
+import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.notification.AlarmNotification;
 import com.nure.alarm.views.AlarmClockActivity;
 
-public class ConfirmationDialog extends AppCompatDialogFragment {
+import org.json.JSONArray;
+
+public class DeletionConfirmationDialog extends AppCompatDialogFragment {
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.confirmation_dialog)
-                .setMessage(R.string.confirmation_message)
+                .setMessage(R.string.deletion_confirmation_message)
                 .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
+                    Information information = FileManager.readInfo(requireActivity().getApplicationContext());
+                    information.setLessons(new JSONArray());
+                    FileManager.writeInfo(requireActivity().getApplicationContext(), information);
+
                     Alarm.cancelAlarm(requireActivity().getApplicationContext());
-                    AlarmClockActivity.updateActivity(requireActivity().getApplicationContext());
+                    AlarmNotification.cancelNotification(requireActivity().getApplicationContext(), AlarmNotification.NOTIFICATION_ID);
+                    AlarmClockActivity.updateActivity(requireActivity().getApplicationContext(), false);
                 })
                 .setNegativeButton(R.string.no, null);
         return builder.create();

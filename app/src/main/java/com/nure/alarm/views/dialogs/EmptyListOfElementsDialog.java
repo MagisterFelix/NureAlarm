@@ -10,14 +10,15 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.nure.alarm.R;
 
-public class ReceivingGroupsDialog extends AppCompatDialogFragment {
+public class EmptyListOfElementsDialog extends AppCompatDialogFragment {
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.receiving_groups_dialog)
-                .setView(R.layout.loading_groups);
+        builder.setTitle(R.string.empty_list_of_elements_dialog)
+                .setMessage(R.string.empty_list_of_elements_message)
+                .setPositiveButton(R.string.ok, null);
         return builder.create();
     }
 }

@@ -52,8 +52,8 @@
                 android:id="@+id/lesson_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignStart="@id/image_time"
-                android:layout_alignEnd="@id/image_time"
+                android:layout_alignStart="@id/change_remove"
+                android:layout_alignEnd="@id/change_remove"
                 android:layout_centerHorizontal="true"
                 android:textAlignment="center"
                 android:textSize="32sp" />
@@ -74,15 +74,32 @@
                     android:contentDescription="@string/alarm_clock"
                     android:src="@drawable/ic_alarm_clock" />
 
-                <TextView
-                    android:id="@+id/alarm_time"
+                <RelativeLayout
+                    android:id="@+id/alarm_time_block"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
                     android:layout_toEndOf="@id/image_alarm"
-                    android:textSize="42sp"
-                    android:textStyle="bold" />
+                    android:layout_marginStart="10dp">
+
+                    <TextView
+                        android:id="@+id/alarm_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:textSize="42sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/alarm_time_left"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@id/alarm_time"
+                        android:textAlignment="center"
+                        android:textSize="14sp" />
+
+                </RelativeLayout>
 
             </RelativeLayout>
 
@@ -119,6 +136,12 @@
 
     <TextView
         android:id="@+id/lesson"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/alarm_options"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone" />

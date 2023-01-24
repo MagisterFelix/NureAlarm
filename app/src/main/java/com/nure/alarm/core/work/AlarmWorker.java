@@ -9,12 +9,15 @@ import androidx.work.WorkerParameters;
 import com.nure.alarm.core.Alarm;
 import com.nure.alarm.core.api.Request;
 import com.nure.alarm.core.managers.FileManager;
+import com.nure.alarm.core.models.DateRange;
+import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.models.LessonsType;
+import com.nure.alarm.core.models.Time;
+import com.nure.alarm.core.utils.DateTimeUtils;
 
 import org.json.JSONException;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
 
 public class AlarmWorker extends Worker {
 
@@ -25,20 +28,28 @@ public class AlarmWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Calendar date = Calendar.getInstance();
-        if (date.get(Calendar.HOUR_OF_DAY) > 7) {
-            date.add(Calendar.DATE, 1);
+        int lessonsType = getInputData().getInt(AlarmWorkerReceiver.LESSONS_TYPE_KEY, LessonsType.AUTO);
+
+        Calendar dateTime = Calendar.getInstance();
+        if ((lessonsType == LessonsType.AUTO && dateTime.after(DateTimeUtils.getSpecificDateTime(new Time(7, 44)))) ||
+                (lessonsType == LessonsType.TOMORROW_FIRST)) {
+            dateTime.add(Calendar.DATE, 1);
         }
 
-        try {
-            Request request = new Request(getApplicationContext());
-            request.getTimeTable(new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date.getTime()),
-                    FileManager.readInfo(getApplicationContext()).getGroup().getLong("id"));
-        } catch (JSONException e) {
-            e.printStackTrace();
+        Information information = FileManager.readInfo(getApplicationContext());
+
+        if (information.getAlarm().length() == 0) {
+            try {
+                Request request = new Request(getApplicationContext());
+                request.getTimeTable(new DateRange(dateTime), information.getGroup().getLong("id"), lessonsType);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
-        Alarm.enableAlarmWork(getApplicationContext(), FileManager.readInfo(getApplicationContext()));
+        if (information.isEnabled()) {
+            Alarm.enableAlarmWork(getApplicationContext(), information);
+        }
 
         return Result.success();
     }
