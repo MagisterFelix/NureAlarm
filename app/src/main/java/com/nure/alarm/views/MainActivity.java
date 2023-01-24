@@ -157,12 +157,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         excludedSubjectsTextView.setOnClickListener(v -> {
+            information = FileManager.readInfo(getApplicationContext());
+
             if (information.getGroup().length() == 0) {
                 NotSpecifiedInformationDialog notSpecifiedInformationDialog = new NotSpecifiedInformationDialog();
                 notSpecifiedInformationDialog.show(getSupportFragmentManager(), NotSpecifiedInformationDialog.class.getSimpleName());
             } else {
                 if (NetworkInfo.isNetworkAvailable(getApplication())) {
-                    information = FileManager.readInfo(getApplicationContext());
                     Request request = new Request(getApplicationContext());
                     try {
                         request.getSubjects(
