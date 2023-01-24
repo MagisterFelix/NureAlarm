@@ -123,45 +123,49 @@ public class Request {
                     String html = Objects.requireNonNull(response.body()).string();
                     Document document = Jsoup.parse(html);
                     Element table = document.select("table[class=footer]").first();
-                    Elements elements = table.select("td[class=name]");
+                    if (table != null) {
+                        Elements elements = table.select("td[class=name]");
+                        for (Element element : elements) {
+                            subjects.put(element.text());
+                        }
 
-                    for (Element element : elements) {
-                        subjects.put(element.text());
-                    }
+                        FileManager.writeSubjects(context, subjects);
 
-                    FileManager.writeSubjects(context, subjects);
-                    new SessionManager(context).saveSubjectsRequestTime(Calendar.getInstance().getTimeInMillis());
+                        Information information = FileManager.readInfo(context);
 
-                    Information information = FileManager.readInfo(context);
+                        ArrayList<String> subjectsArray = JSONUtils.getArrayListFromJSONArray(subjects);
+                        ArrayList<String> excludedSubjectsArray = JSONUtils.getArrayListFromJSONArray(information.getExcludedSubjects());
 
-                    ArrayList<String> subjectsArray = JSONUtils.getArrayListFromJSONArray(subjects);
-                    ArrayList<String> excludedSubjectsArray = JSONUtils.getArrayListFromJSONArray(information.getExcludedSubjects());
-
-                    if (excludedSubjectsArray.size() != 0) {
-                        int i = 0;
-                        while (i < subjectsArray.size()) {
-                            if (excludedSubjectsArray.contains(subjectsArray.get(i))) {
-                                break;
+                        if (excludedSubjectsArray.size() != 0) {
+                            int i = 0;
+                            while (i < subjectsArray.size()) {
+                                if (excludedSubjectsArray.contains(subjectsArray.get(i))) {
+                                    break;
+                                }
+                                ++i;
                             }
-                            ++i;
+                            if (i == subjectsArray.size()) {
+                                information.setExcludedSubjects(new JSONArray());
+                                FileManager.writeInfo(context, information);
+                                excludedSubjectsTextView.setText("");
+                            }
                         }
-                        if (i == subjectsArray.size()) {
-                            information.setExcludedSubjects(new JSONArray());
-                            FileManager.writeInfo(context, information);
-                            excludedSubjectsTextView.setText("");
-                        }
-                    }
 
-                    try {
-                        receivingSubjectsDialog.dismiss();
-                        if (FileManager.readSubjects(context).size() != 0) {
-                            MainActivity.showSubjects(activity, context, excludedSubjectsTextView);
-                        } else {
-                            EmptyListOfElementsDialog emptyListOfElementsDialog = new EmptyListOfElementsDialog();
-                            emptyListOfElementsDialog.show(fragmentManager, EmptyListOfElementsDialog.class.getSimpleName());
+                        try {
+                            receivingSubjectsDialog.dismiss();
+                            if (FileManager.readSubjects(context).size() != 0) {
+                                MainActivity.showSubjects(activity, context, excludedSubjectsTextView);
+                            } else {
+                                EmptyListOfElementsDialog emptyListOfElementsDialog = new EmptyListOfElementsDialog();
+                                emptyListOfElementsDialog.show(fragmentManager, EmptyListOfElementsDialog.class.getSimpleName());
+                            }
+                        } catch (IllegalStateException e) {
+                            e.printStackTrace();
                         }
-                    } catch (IllegalStateException e) {
-                        e.printStackTrace();
+                    } else {
+                        receivingSubjectsDialog.dismiss();
+                        EmptyListOfElementsDialog emptyListOfElementsDialog = new EmptyListOfElementsDialog();
+                        emptyListOfElementsDialog.show(fragmentManager, EmptyListOfElementsDialog.class.getSimpleName());
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

@@ -162,31 +162,18 @@ public class MainActivity extends AppCompatActivity {
                 notSpecifiedInformationDialog.show(getSupportFragmentManager(), NotSpecifiedInformationDialog.class.getSimpleName());
             } else {
                 if (NetworkInfo.isNetworkAvailable(getApplication())) {
-                    Calendar now = Calendar.getInstance();
-                    Calendar lastTime = Calendar.getInstance();
-                    lastTime.setTimeInMillis(sessionManager.fetchSubjectsRequestTime());
-
-                    if (TimeUnit.MILLISECONDS.toDays(now.getTimeInMillis() - lastTime.getTimeInMillis()) > 0
-                            || FileManager.readSubjects(getApplicationContext()).size() == 0) {
-                        Request request = new Request(getApplicationContext());
-                        try {
-                            request.getSubjects(
-                                    this,
-                                    getSupportFragmentManager(),
-                                    excludedSubjectsTextView,
-                                    getSemesterInterval(),
-                                    information.getGroup().getLong("id")
-                            );
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        if (FileManager.readSubjects(ContextManager.getLocaleContext(getApplicationContext())).size() != 0) {
-                            showSubjects(this, ContextManager.getLocaleContext(getApplicationContext()), excludedSubjectsTextView);
-                        } else {
-                            EmptyListOfElementsDialog emptyListOfElementsDialog = new EmptyListOfElementsDialog();
-                            emptyListOfElementsDialog.show(getSupportFragmentManager(), EmptyListOfElementsDialog.class.getSimpleName());
-                        }
+                    information = FileManager.readInfo(getApplicationContext());
+                    Request request = new Request(getApplicationContext());
+                    try {
+                        request.getSubjects(
+                                this,
+                                getSupportFragmentManager(),
+                                excludedSubjectsTextView,
+                                getSemesterInterval(),
+                                information.getGroup().getLong("id")
+                        );
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 } else {
                     UnavailableNetworkDialog unavailableNetworkDialog = new UnavailableNetworkDialog();
