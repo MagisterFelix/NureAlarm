@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/select_group"
-        android:textColor="#757575"
+        android:textColor="@color/grey"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -30,7 +30,7 @@
         android:padding="12dp"
         android:singleLine="true"
         android:textColor="@color/black"
-        android:textColorHint="#757575" />
+        android:textColorHint="@color/grey" />
 
     <ListView
         android:id="@+id/group_list_view"
