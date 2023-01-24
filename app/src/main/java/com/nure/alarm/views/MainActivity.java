@@ -359,11 +359,28 @@ public class MainActivity extends AppCompatActivity {
             }
 
             Information information = FileManager.readInfo(context);
+            try {
+                if (information.getGroup().length() != 0 && object.getLong("id") != information.getGroup().getLong("id")) {
+                    information.setExcludedSubjects(new JSONArray());
+                    TextView excludedSubjectsTextView = activity.findViewById(R.id.excluded_subjects);
+                    excludedSubjectsTextView.setText("");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             information.setGroup(object);
             FileManager.writeInfo(context, information);
 
             dialog.dismiss();
         });
+
+        try {
+            if (FileManager.readInfo(context).getGroup().length() != 0) {
+                listView.setSelection(sorted_groups.indexOf(FileManager.readInfo(context).getGroup().getString("name")));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void showSubjects(Activity activity, Context context, TextView excludedSubjectsTextView) {
