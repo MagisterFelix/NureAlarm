@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,6 +68,13 @@ public class Request {
         apiClient.getApiService().group().enqueue(new Callback<Object>() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
+                if (response.body() == null) {
+                    receivingGroupsDialog.dismiss();
+                    FailedGroupsRequestDialog failedGroupsRequestDialog = new FailedGroupsRequestDialog();
+                    failedGroupsRequestDialog.show(fragmentManager, FailedGroupsRequestDialog.class.getSimpleName());
+                    return;
+                }
+
                 Gson gson = new GsonBuilder().
                         registerTypeAdapter(Double.class, (JsonSerializer<Double>) (src, typeOfSrc, context) -> {
                             if (src == src.longValue()) {
@@ -117,10 +123,17 @@ public class Request {
         apiClient.getApiService().timetable(query).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (response.body() == null) {
+                    receivingSubjectsDialog.dismiss();
+                    FailedSubjectsRequestDialog failedSubjectsRequestDialog = new FailedSubjectsRequestDialog();
+                    failedSubjectsRequestDialog.show(fragmentManager, FailedSubjectsRequestDialog.class.getSimpleName());
+                    return;
+                }
+
                 try {
                     JSONArray subjects = new JSONArray();
 
-                    String html = Objects.requireNonNull(response.body()).string();
+                    String html = response.body().string();
                     Document document = Jsoup.parse(html);
                     Element table = document.select("table[class=footer]").first();
                     if (table != null) {
@@ -192,10 +205,16 @@ public class Request {
         apiClient.getApiService().timetable(query).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                if (response.body() == null) {
+                    AlarmNotification.sendNotification(context, context.getString(R.string.failed_timetable_request_message), null, lessonsType);
+                    AlarmClockActivity.updateActivity(context, false);
+                    return;
+                }
+
                 try {
                     JSONArray lessons = new JSONArray();
 
-                    String html = Objects.requireNonNull(response.body()).string();
+                    String html = response.body().string();
                     Document document = Jsoup.parse(html);
                     Element table = document.select("table[class=MainTT]").first();
                     Elements elements = table.select("tr:has(td[class=left])");
