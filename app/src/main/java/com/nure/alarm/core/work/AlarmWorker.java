@@ -14,6 +14,7 @@ import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.models.LessonsType;
 import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.utils.DateTimeUtils;
+import com.nure.alarm.views.AlarmClockActivity;
 
 import org.json.JSONException;
 
@@ -39,6 +40,9 @@ public class AlarmWorker extends Worker {
         Information information = FileManager.readInfo(getApplicationContext());
 
         if (information.getAlarm().length() == 0) {
+            if (lessonsType == LessonsType.AUTO) {
+                AlarmClockActivity.updateActivity(getApplicationContext(), true);
+            }
             try {
                 Request request = new Request(getApplicationContext());
                 request.getTimeTable(new DateRange(dateTime), information.getGroup().getLong("id"), lessonsType);

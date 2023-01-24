@@ -40,8 +40,8 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                     AlarmClockActivity.updateActivity(context, false);
                 }
                 if (action.equals(ACTION_RETRY)) {
-                    AlarmWorkerReceiver.startWork(context, intent.getIntExtra(LessonsType.class.getSimpleName(), LessonsType.AUTO));
                     AlarmClockActivity.updateActivity(context, true);
+                    AlarmWorkerReceiver.startWork(context, intent.getIntExtra(LessonsType.class.getSimpleName(), LessonsType.AUTO));
                 }
             }
         }
