@@ -91,18 +91,20 @@ public class FileManager {
                     object.getJSONObject("alarm")
             );
         } catch (JSONException e) {
-            e.printStackTrace();
-        }
+            Information information = new Information(
+                    DISABLED,
+                    DEFAULT_SETTING_TIME,
+                    DEFAULT_ACTIVATION,
+                    UNDEFINED_GROUP,
+                    UNDEFINED_EXCLUDED_SUBJECTS,
+                    UNDEFINED_LESSONS,
+                    UNDEFINED_ALARM
+            );
 
-        return new Information(
-                DISABLED,
-                DEFAULT_SETTING_TIME,
-                DEFAULT_ACTIVATION,
-                UNDEFINED_GROUP,
-                UNDEFINED_EXCLUDED_SUBJECTS,
-                UNDEFINED_LESSONS,
-                UNDEFINED_ALARM
-        );
+            writeInfo(context, information);
+
+            return information;
+        }
     }
 
     public static void writeInfo(Context context, Information information) {
