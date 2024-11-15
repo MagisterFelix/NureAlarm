@@ -2,6 +2,7 @@ package com.nure.alarm.views;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -37,6 +38,7 @@ import com.nure.alarm.core.models.DateRange;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.network.NetworkInfo;
+import com.nure.alarm.core.notification.AlarmNotification;
 import com.nure.alarm.core.updater.Updater;
 import com.nure.alarm.core.utils.ActivityUtils;
 import com.nure.alarm.core.utils.JSONUtils;
@@ -67,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(AlarmNotification.NOTIFICATION_ID);
 
         information = FileManager.readInfo(getApplicationContext());
         sessionManager = new SessionManager(getApplicationContext());

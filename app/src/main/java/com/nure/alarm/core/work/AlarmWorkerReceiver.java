@@ -20,13 +20,14 @@ public class AlarmWorkerReceiver extends BroadcastReceiver {
     private static final String ALARM_WORK_TAG = "AlarmWork";
 
     public static final String LESSONS_TYPE_KEY = "lessons_type";
+    public static final String FORCE_NOTIFY_KEY = "force_notify";
 
-    public static void startWork(Context context, int lessonsType) {
+    public static void startWork(Context context, int lessonsType, boolean forceNotify) {
         OneTimeWorkRequest request = new OneTimeWorkRequest
                 .Builder(ALARM_WORKER_CLASS)
                 .setConstraints(NETWORK_CONNECTED)
                 .addTag(ALARM_WORK_TAG)
-                .setInputData(new Data.Builder().putInt(LESSONS_TYPE_KEY, lessonsType).build())
+                .setInputData(new Data.Builder().putInt(LESSONS_TYPE_KEY, lessonsType).putBoolean(FORCE_NOTIFY_KEY, forceNotify).build())
                 .build();
 
         WorkManager.getInstance(context).enqueueUniqueWork(ALARM_WORK_TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, request);
@@ -38,6 +39,6 @@ public class AlarmWorkerReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        startWork(context, LessonsType.AUTO);
+        startWork(context, LessonsType.AUTO, false);
     }
 }

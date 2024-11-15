@@ -24,7 +24,7 @@ import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.models.Information;
 import com.nure.alarm.core.notification.AlarmNotificationReceiver;
 import com.nure.alarm.views.AlarmActivity;
-import com.nure.alarm.views.MainActivity;
+import com.nure.alarm.views.AlarmClockActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,7 +78,7 @@ public class AlarmService extends Service {
             manager.createNotificationChannel(channel);
 
             PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0,
-                    new Intent(context, MainActivity.class),
+                    new Intent(context, AlarmClockActivity.class),
                     PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
             PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(context, 0,
                     new Intent(context, AlarmActivity.class),
@@ -86,17 +86,24 @@ public class AlarmService extends Service {
             PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 0,
                     new Intent(context, AlarmNotificationReceiver.class).setAction(AlarmNotificationReceiver.ACTION_DISMISS),
                     PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent resetPendingIntent = PendingIntent.getBroadcast(context, 0,
+                    new Intent(context, AlarmNotificationReceiver.class).setAction(AlarmNotificationReceiver.ACTION_RESET),
+                    PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
                     .setGroup(NOTIFICATION_NAME)
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setCategory(NotificationCompat.CATEGORY_ALARM)
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .setSmallIcon(R.drawable.ic_alarm)
                     .setContentTitle(context.getString(R.string.alarm_clock))
-                    .setContentText(alarm.getString("time"))
+                    .setContentText(alarm.getString("name") + " - " + alarm.getString("time"))
                     .setContentIntent(resultPendingIntent)
-                    .setCategory(NotificationCompat.CATEGORY_ALARM)
                     .setFullScreenIntent(fullScreenPendingIntent, true)
-                    .addAction(R.drawable.ic_dismiss, context.getString(R.string.dismiss), dismissPendingIntent);
+                    .setDeleteIntent(dismissPendingIntent)
+                    .setOngoing(true)
+                    .addAction(R.drawable.ic_alarm_off, context.getString(R.string.dismiss), dismissPendingIntent)
+                    .addAction(R.drawable.ic_alarm_set, context.getString(R.string.reset), resetPendingIntent);
 
             Notification notification = builder.build();
             startForeground(NOTIFICATION_ID, notification);
@@ -121,7 +128,7 @@ public class AlarmService extends Service {
         mediaPlayer.start();
         vibrator.vibrate(VibrationEffect.createWaveform(new long[]{ 0, 500, 500, 500, 500 }, 0));
 
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override

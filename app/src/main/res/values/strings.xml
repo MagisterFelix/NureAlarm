@@ -19,6 +19,7 @@
     <string name="option_today_nearest">The next today\'s lesson</string>
     <string name="option_tomorrow_first">The first lesson of tomorrow</string>
     <string name="dismiss">Dismiss</string>
+    <string name="reset">Reset</string>
     <string name="remove">Remove</string>
     <string name="search">Search…</string>
     <string name="receiving_groups_message">NureAlarm receives a list of groups, please wait a moment.</string>

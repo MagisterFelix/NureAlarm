@@ -33,9 +33,12 @@ public class AlarmNotification {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL)
                 .setGroup(NOTIFICATION_NAME)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(context.getString(R.string.alarm_clock))
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                .setContentText(message)
                 .setContentIntent(resultPendingIntent)
                 .setAutoCancel(true);
 
@@ -52,6 +55,8 @@ public class AlarmNotification {
                                 .setAction(AlarmNotificationReceiver.ACTION_REMOVE),
                         PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
                 builder.addAction(R.drawable.ic_remove, context.getString(R.string.remove), removePendingIntent);
+            } else {
+                builder.setTimeoutAfter(5000);
             }
         } else {
             PendingIntent retryPendingIntent = PendingIntent.getBroadcast(context, 0,

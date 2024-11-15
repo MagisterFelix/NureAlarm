@@ -14,6 +14,7 @@ import com.nure.alarm.views.AlarmClockActivity;
 public class AlarmNotificationReceiver extends BroadcastReceiver {
 
     public static final String ACTION_DISMISS = "dismiss";
+    public static final String ACTION_RESET = "reset";
     public static final String ACTION_CHANGE = "change";
     public static final String ACTION_REMOVE = "remove";
     public static final String ACTION_RETRY = "retry";
@@ -25,6 +26,10 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
         if (action.equals(ACTION_DISMISS)) {
             Alarm.stopAlarm(context);
             AlarmClockActivity.updateActivity(context, false);
+        } else if (action.equals(ACTION_RESET)) {
+            Alarm.stopAlarm(context);
+            AlarmClockActivity.updateActivity(context, true);
+            AlarmWorkerReceiver.startWork(context, LessonsType.TODAY_NEAREST, true);
         } else {
             NotificationManagerCompat.from(context).cancel(AlarmNotification.NOTIFICATION_ID);
 
@@ -41,7 +46,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                 }
                 if (action.equals(ACTION_RETRY)) {
                     AlarmClockActivity.updateActivity(context, true);
-                    AlarmWorkerReceiver.startWork(context, intent.getIntExtra(LessonsType.class.getSimpleName(), LessonsType.AUTO));
+                    AlarmWorkerReceiver.startWork(context, intent.getIntExtra(LessonsType.class.getSimpleName(), LessonsType.AUTO), false);
                 }
             }
         }

@@ -261,7 +261,7 @@ public class AlarmClockActivity extends AppCompatActivity {
 
             listView.setAdapter(optionsAdapter);
             listView.setOnItemClickListener((parent, view, position, id) -> {
-                AlarmWorkerReceiver.startWork(getApplicationContext(), position == 0 ? LessonsType.TODAY_NEAREST : LessonsType.TOMORROW_FIRST);
+                AlarmWorkerReceiver.startWork(getApplicationContext(), position == 0 ? LessonsType.TODAY_NEAREST : LessonsType.TOMORROW_FIRST, false);
                 setLoadingIcon(menuItem);
                 dialog.dismiss();
             });
@@ -302,7 +302,7 @@ public class AlarmClockActivity extends AppCompatActivity {
                             0
                     );
                     if (information.getAlarm().getInt("number") == jsonObject.getInt("number")) {
-                        lesson =  HtmlCompat.fromHtml("<b>" + lesson + "</b>", 0);
+                        lesson = HtmlCompat.fromHtml("<b>" + lesson + "</b>", 0);
                     }
                     formatted_lessons.add(lesson);
                 } catch (JSONException e) {

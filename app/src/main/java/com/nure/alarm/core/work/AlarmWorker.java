@@ -30,6 +30,7 @@ public class AlarmWorker extends Worker {
     @Override
     public Result doWork() {
         int lessonsType = getInputData().getInt(AlarmWorkerReceiver.LESSONS_TYPE_KEY, LessonsType.AUTO);
+        boolean forceNotify = getInputData().getBoolean(AlarmWorkerReceiver.FORCE_NOTIFY_KEY, false);
 
         Calendar dateTime = Calendar.getInstance();
         if ((lessonsType == LessonsType.AUTO && dateTime.after(DateTimeUtils.getSpecificDateTime(new Time(7, 44)))) ||
@@ -45,7 +46,7 @@ public class AlarmWorker extends Worker {
             }
             try {
                 Request request = new Request(getApplicationContext());
-                request.getTimeTable(new DateRange(dateTime), information.getGroup().getLong("id"), lessonsType);
+                request.getTimeTable(new DateRange(dateTime), information.getGroup().getLong("id"), lessonsType, forceNotify);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

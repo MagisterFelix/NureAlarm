@@ -18,6 +18,7 @@ import com.nure.alarm.core.managers.FileManager;
 import com.nure.alarm.core.managers.SessionManager;
 import com.nure.alarm.core.models.DateRange;
 import com.nure.alarm.core.models.Information;
+import com.nure.alarm.core.models.LessonsType;
 import com.nure.alarm.core.models.Time;
 import com.nure.alarm.core.notification.AlarmNotification;
 import com.nure.alarm.core.utils.DateTimeUtils;
@@ -198,7 +199,7 @@ public class Request {
         });
     }
 
-    public void getTimeTable(DateRange dateRange, long group_id, int lessonsType) {
+    public void getTimeTable(DateRange dateRange, long group_id, int lessonsType, boolean forceNotify) {
         String unformattedQuery = "778:201::::201:P201_FIRST_DATE,P201_LAST_DATE,P201_GROUP,P201_POTOK:%s,%d,0:";
         String query = String.format(Locale.getDefault(), unformattedQuery, dateRange.getRange(), group_id);
 
@@ -280,10 +281,14 @@ public class Request {
                                 unformattedMessage, nextLesson.getInt("number"), nextLesson.getString("name")
                         );
 
-                        AlarmNotification.sendNotification(context, message, true, null);
+                        if (lessonsType == LessonsType.AUTO || forceNotify) {
+                            AlarmNotification.sendNotification(context, message, true, null);
+                        }
                         AlarmClockActivity.updateActivity(context, false);
                     } else {
-                        AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), false, null);
+                        if (lessonsType != LessonsType.AUTO || forceNotify) {
+                            AlarmNotification.sendNotification(context, context.getString(R.string.no_lessons), false, null);
+                        }
                         AlarmClockActivity.updateActivity(context, false);
                     }
                 } catch (IOException | JSONException e) {
