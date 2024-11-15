@@ -41,7 +41,7 @@
         <item>2 hours</item>
     </string-array>
     <string name="locale">Locale</string>
-    <string name="help_message"><b>Alarm setting time</b> - the time at which the alarm will be set. For example: if 20:00 is set, then every day at 20:00 the alarm will be set for the first lesson and you will receive a notification.\n\n<b>Group</b> - the group in which you study.\n\n<b>Activation</b> - how many minutes/hours before the lesson the alarm will go off. For example: if 30 minutes is set and the lesson starts at 11:15, then the alarm will be set to 10:45.\n\n<b>Excluded subjects</b> - subjects that will not be taken into account when receiving data and setting the alarm.</string>
+    <string name="help_message"><b>Alarm setting time</b> - the time at which the alarm will be set. For example: if 20:00 is set, then every day at 20:00 the alarm will be set for the first lesson and you will receive a notification.\n\n<b>Group</b> - the group in which you study.\n\n<b>Activation</b> - how many minutes/hours before the lesson the alarm will go off. For example: if 30 minutes is set and the lesson starts at 11:15, then the alarm will be set to 10:45.\n\n<b>Excluded subjects</b> - subjects that will not be taken into account when receiving data and setting the alarm.\n\n<b>Note</b> - if the phone forcibly puts the application to sleep, or kills the process - try to provide unlimited background work in the settings, or block the ability to put it to sleep.</string>
     <string name="settings">Settings</string>
     <string name="no_alarm">No alarm</string>
     <string name="time_left">(%d h %d min left)</string>
