@@ -63,4 +63,6 @@
     <string name="update_available">New update available!</string>
     <string name="update">Update</string>
     <string name="downloading">Downloading</string>
+    <string name="swipe_to_dismiss">Swipe to dismiss</string>
+    <string name="swipe_to_reset">Swipe to reset</string>
 </resources>

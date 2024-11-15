@@ -10,7 +10,7 @@
         android:id="@+id/alarm_main_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/dismiss_alarm_button"
+        app:layout_constraintBottom_toTopOf="@id/swipe_button_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -36,48 +36,86 @@
 
     </RelativeLayout>
 
-    <ImageView
-        android:id="@+id/second_circle"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_margin="50dp"
-        android:src="@drawable/circle"
+    <FrameLayout
+        android:id="@+id/swipe_button_container"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_margin="30dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/swipe_button_background"
         android:theme="@style/Theme.NureAlarm"
-        android:contentDescription="@string/dismiss"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/alarm_main_info" />
+        app:layout_constraintTop_toBottomOf="@id/alarm_main_info">
 
-    <ImageView
-        android:id="@+id/first_circle"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_margin="50dp"
-        android:src="@drawable/circle"
-        android:theme="@style/Theme.NureAlarm"
-        android:contentDescription="@string/dismiss"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/alarm_main_info" />
+        <TextView
+            android:id="@+id/dismiss_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="16dp"
+            android:text="@string/dismiss"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
 
-    <ImageButton
-        android:id="@+id/dismiss_alarm_button"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_margin="50dp"
-        android:src="@drawable/ic_alarm_off"
-        android:contentDescription="@string/dismiss"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        android:padding="15dp"
-        android:theme="@style/Theme.NureAlarm"
-        style="@style/CircleButton"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/alarm_main_info" />
+        <ImageView
+            android:id="@+id/left_arrow_1"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="40dp"
+            android:src="@drawable/ic_arrow_left"
+            android:contentDescription="@string/swipe_to_dismiss" />
+
+        <ImageView
+            android:id="@+id/left_arrow_2"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="40dp"
+            android:src="@drawable/ic_arrow_left"
+            android:contentDescription="@string/swipe_to_dismiss" />
+
+        <ImageView
+            android:id="@+id/right_arrow_1"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="40dp"
+            android:src="@drawable/ic_arrow_right"
+            android:contentDescription="@string/swipe_to_reset" />
+
+        <ImageView
+            android:id="@+id/right_arrow_2"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="40dp"
+            android:src="@drawable/ic_arrow_right"
+            android:contentDescription="@string/swipe_to_reset" />
+
+        <TextView
+            android:id="@+id/reset_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="16dp"
+            android:text="@string/reset"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:id="@+id/swipe_button"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:padding="10dp"
+            android:src="@drawable/ic_stop"
+            android:contentDescription="@string/dismiss"
+            style="@style/CircleButton" />
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
