@@ -14,3 +14,6 @@ Application to simplify life. If you are as lucky as me (studying in **Nure**), 
 * Possibility to set an alarm clock manually both for the next lesson of the current day and for the first lesson of tomorrow;
 * Ability to change the lesson or remove the alarm in the notification and in a specific part of the application;
 * The ability to easily turn off the alarm even when the screen is off/locked.
+
+## Note
+If your phone forcibly puts the application to sleep, or kills the process altogether - try to give the application unlimited background work in the settings, or block the ability to put this application to sleep.
